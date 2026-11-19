@@ -15,6 +15,9 @@ public class HistorialPartida {
     private int saldoFinal;
 
     public HistorialPartida (){}
+    public int calcularBalance(){
+        return 0;
+    }
 
     //Encapsulamiento
 
@@ -49,8 +52,7 @@ public class HistorialPartida {
     public int obtenerApuestaTotal (){
         return apuestaTotal;
     }
-    public void modificarApuestaTotal (){
-        this.apuestaTotal = apuestaTotal;
+    public void modificarApuestaTotal(int apuestaTotal) {this.apuestaTotal = apuestaTotal;
     }
 
     public int obtenerPuntosGanadosPerdidos (){

@@ -50,8 +50,7 @@ public class Partida {
     public void modificarFechaFinalizacion (LocalDateTime fechaFinalizacion) {this.fechaFinalizacion = fechaFinalizacion;}
 
     public Resultado obtenerResultado (){return resultado;}
-    public void modificarResultado (){this.resultado = resultado;}
-
+    public void modificarResultado(Resultado resultado) {this.resultado = resultado;}
     public boolean obtenerFinalizada (){return finalizada;}
     public void modificarFinalizada (boolean finalizada) {this.finalizada = finalizada;}
 

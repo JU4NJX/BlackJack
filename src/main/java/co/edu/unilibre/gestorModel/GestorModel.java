@@ -1,6 +1,5 @@
 package co.edu.unilibre.gestorModel;
 
-import co.edu.unilibre.state.Estado;
 import co.edu.unilibre.view.Resultado;
 
 import java.util.List;
