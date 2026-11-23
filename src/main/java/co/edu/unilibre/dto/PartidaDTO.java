@@ -3,96 +3,44 @@ package co.edu.unilibre.dto;
 import co.edu.unilibre.model.enums.EstadoPartida;
 import co.edu.unilibre.model.enums.Resultado;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PartidaDTO {
 
-    private Long id;
-    private Long idUsuario;
-    private List<List<CartaDTO>> manosJuagdor;
-    private List<Integer> puntuacionesManos;
-    private List<String> estadosManos;
-    private List<ApuestaDTO> apuestasManos;
-    private List<CartaDTO> manoCrupier;
-    private LocalDateTime fechaInicio;
-    private LocalDateTime fechaFinalizacion;
+    private int id;
+    private int puntuacionJugador;
+    private int puntuacionCrupier;
     private EstadoPartida estado;
     private Resultado resultado;
-    private int saldoFinal;
+    private List<CartaDTO> cartasJugador = new ArrayList<>();
+    private List<CartaDTO> cartasCrupier = new ArrayList<>();
+    private List<List<CartaDTO>> manosJugador = new ArrayList<>();
+    private double saldoActual;
+    private double apuestaTotal;
 
-    //ENCAPSULAMIENTO
-
-    public Long obtenerId() {
+    public int obtenerId() {
         return id;
     }
 
-    public void modificarId(Long id) {
+    public void modificarId(int id) {
         this.id = id;
     }
 
-    public Long obtenerIdUsuario() {
-        return idUsuario;
+    public int obtenerPuntuacionJugador() {
+        return puntuacionJugador;
     }
 
-    public void modificarIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    public void modificarPuntuacionJugador(int puntuacionJugador) {
+        this.puntuacionJugador = puntuacionJugador;
     }
 
-    public List<List<CartaDTO>> obtenerManosJuagdor() {
-        return manosJuagdor;
+    public int obtenerPuntuacionCrupier() {
+        return puntuacionCrupier;
     }
 
-    public void modificarManosJuagdor(List<List<CartaDTO>> manosJuagdor) {
-        this.manosJuagdor = manosJuagdor;
-    }
-
-    public List<Integer> obtenerPuntuacionesManos() {
-        return puntuacionesManos;
-    }
-
-    public void modificarPuntuacionesManos(List<Integer> puntuacionesManos) {
-        this.puntuacionesManos = puntuacionesManos;
-    }
-
-    public List<String> obtenerEstadosManos() {
-        return estadosManos;
-    }
-
-    public void modificarEstadosManos(List<String> estadosManos) {
-        this.estadosManos = estadosManos;
-    }
-
-    public List<ApuestaDTO> obtenerApuestasManos() {
-        return apuestasManos;
-    }
-
-    public void modificarApuestasManos(List<ApuestaDTO> apuestasManos) {
-        this.apuestasManos = apuestasManos;
-    }
-
-    public List<CartaDTO> obtenerManoCrupier() {
-        return manoCrupier;
-    }
-
-    public void modificarManoCrupier(List<CartaDTO> manoCrupier) {
-        this.manoCrupier = manoCrupier;
-    }
-
-    public LocalDateTime obtenerFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void modificarFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDateTime obtenerFechaFinalizacion() {
-        return fechaFinalizacion;
-    }
-
-    public void modificarFechaFinalizacion(LocalDateTime fechaFinalizacion) {
-        this.fechaFinalizacion = fechaFinalizacion;
+    public void modificarPuntuacionCrupier(int puntuacionCrupier) {
+        this.puntuacionCrupier = puntuacionCrupier;
     }
 
     public EstadoPartida obtenerEstado() {
@@ -111,11 +59,43 @@ public class PartidaDTO {
         this.resultado = resultado;
     }
 
-    public int obtenerSaldoFinal() {
-        return saldoFinal;
+    public List<CartaDTO> obtenerCartasJugador() {
+        return cartasJugador;
     }
 
-    public void modificarSaldoFinal(int saldoFinal) {
-        this.saldoFinal = saldoFinal;
+    public void modificarCartasJugador(List<CartaDTO> cartasJugador) {
+        this.cartasJugador = cartasJugador;
+    }
+
+    public List<CartaDTO> obtenerCartasCrupier() {
+        return cartasCrupier;
+    }
+
+    public void modificarCartasCrupier(List<CartaDTO> cartasCrupier) {
+        this.cartasCrupier = cartasCrupier;
+    }
+
+    public List<List<CartaDTO>> obtenerManosJugador() {
+        return manosJugador;
+    }
+
+    public void modificarManosJugador(List<List<CartaDTO>> manosJugador) {
+        this.manosJugador = manosJugador;
+    }
+
+    public double obtenerSaldoActual() {
+        return saldoActual;
+    }
+
+    public void modificarSaldoActual(double saldoActual) {
+        this.saldoActual = saldoActual;
+    }
+
+    public double obtenerApuestaTotal() {
+        return apuestaTotal;
+    }
+
+    public void modificarApuestaTotal(double apuestaTotal) {
+        this.apuestaTotal = apuestaTotal;
     }
 }

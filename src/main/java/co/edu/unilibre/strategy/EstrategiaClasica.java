@@ -2,10 +2,10 @@ package co.edu.unilibre.strategy;
 
 import co.edu.unilibre.model.Mano;
 
-public class EstrategiaClasica {
+public class EstrategiaClasica implements EstrategiaCrupier {
 
-    public boolean debePedirCarta(Mano mano){
-        return false;
+    @Override
+    public boolean debePedirCarta(Mano mano) {
+        return mano.calcularPuntuacion() < 17;
     }
-
 }

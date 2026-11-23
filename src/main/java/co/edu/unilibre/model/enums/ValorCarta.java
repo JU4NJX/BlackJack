@@ -1,7 +1,6 @@
 package co.edu.unilibre.model.enums;
 
 public enum ValorCarta {
-
     AS,
     DOS,
     TRES,
@@ -15,5 +14,4 @@ public enum ValorCarta {
     J,
     Q,
     K;
-
 }

@@ -1,10 +1,8 @@
 package co.edu.unilibre.model.enums;
 
 public enum Resultado {
-
-    VICTORIA,
-    DERROTA,
+    GANADA,
+    PERDIDA,
     EMPATE,
-    BLACKJACK_NATURAL;
-
+    BLACKJACK;
 }

@@ -2,39 +2,40 @@ package co.edu.unilibre.dto;
 
 public class ApuestaDTO {
 
-    private int cantidadInicial;
-    private int cantidadTotal;
-    private String tipo;
+    private double montoInicial;
+    private double montoTotal;
+    private double montoAdicional;
+    private double saldoDisponible;
 
-    public ApuestaDTO(int cantidadInicial, int cantidadTotal, String tipo) {
-        this.cantidadInicial = cantidadInicial;
-        this.cantidadTotal = cantidadTotal;
-        this.tipo = tipo;
+    public double obtenerMontoInicial() {
+        return montoInicial;
     }
 
-    //ENCAPSULAMIENTO
-    public int obtenerCantidadInicial() {
-        return cantidadInicial;
+    public void modificarMontoInicial(double montoInicial) {
+        this.montoInicial = montoInicial;
     }
 
-    public void modificarCantidadInicial(int cantidadInicial) {
-        this.cantidadInicial = cantidadInicial;
+    public double obtenerMontoTotal() {
+        return montoTotal;
     }
 
-    public int obtenerCantidadTotal() {
-        return cantidadTotal;
+    public void modificarMontoTotal(double montoTotal) {
+        this.montoTotal = montoTotal;
     }
 
-    public void modificarCantidadTotal(int cantidadTotal) {
-        this.cantidadTotal = cantidadTotal;
+    public double obtenerMontoAdicional() {
+        return montoAdicional;
     }
 
-    public String obtenerTipo() {
-        return tipo;
+    public void modificarMontoAdicional(double montoAdicional) {
+        this.montoAdicional = montoAdicional;
     }
 
-    public void modificarTipo(String tipo) {
-        this.tipo = tipo;
+    public double obtenerSaldoDisponible() {
+        return saldoDisponible;
     }
 
+    public void modificarSaldoDisponible(double saldoDisponible) {
+        this.saldoDisponible = saldoDisponible;
+    }
 }

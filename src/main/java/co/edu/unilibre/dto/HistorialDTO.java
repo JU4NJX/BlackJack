@@ -1,29 +1,22 @@
 package co.edu.unilibre.dto;
 
-import co.edu.unilibre.model.enums.Resultado;
-
 import java.time.LocalDateTime;
 
 public class HistorialDTO {
 
-    private Long id;
+    private int id;
     private LocalDateTime fecha;
-    private Resultado resultado;
-    private int apuestaTotal;
-    private int puntosGastadosPerdidos;
-    private int saldoFinal;
+    private String resultado;
+    private double apuesta;
+    private double puntosGanados;
+    private double puntosPerdidos;
+    private double saldoFinal;
 
-    public HistorialDTO() {
-
-    }
-
-    //ENCAPSULAMIENTO
-
-    public Long obtenerId() {
+    public int obtenerId() {
         return id;
     }
 
-    public void modificarId(Long id) {
+    public void modificarId(int id) {
         this.id = id;
     }
 
@@ -35,35 +28,43 @@ public class HistorialDTO {
         this.fecha = fecha;
     }
 
-    public Resultado obtenerResultado() {
+    public String obtenerResultado() {
         return resultado;
     }
 
-    public void modificarResultado(Resultado resultado) {
+    public void modificarResultado(String resultado) {
         this.resultado = resultado;
     }
 
-    public int obtenerApuestaTotal() {
-        return apuestaTotal;
+    public double obtenerApuesta() {
+        return apuesta;
     }
 
-    public void modificarApuestaTotal(int apuestaTotal) {
-        this.apuestaTotal = apuestaTotal;
+    public void modificarApuesta(double apuesta) {
+        this.apuesta = apuesta;
     }
 
-    public int obtenerPuntosGastadosPerdidos() {
-        return puntosGastadosPerdidos;
+    public double obtenerPuntosGanados() {
+        return puntosGanados;
     }
 
-    public void modificarPuntosGastadosPerdidos(int puntosGastadosPerdidos) {
-        this.puntosGastadosPerdidos = puntosGastadosPerdidos;
+    public void modificarPuntosGanados(double puntosGanados) {
+        this.puntosGanados = puntosGanados;
     }
 
-    public int obtenerSaldoFinal() {
+    public double obtenerPuntosPerdidos() {
+        return puntosPerdidos;
+    }
+
+    public void modificarPuntosPerdidos(double puntosPerdidos) {
+        this.puntosPerdidos = puntosPerdidos;
+    }
+
+    public double obtenerSaldoFinal() {
         return saldoFinal;
     }
 
-    public void modificarSaldoFinal(int saldoFinal) {
+    public void modificarSaldoFinal(double saldoFinal) {
         this.saldoFinal = saldoFinal;
     }
 }

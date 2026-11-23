@@ -2,34 +2,25 @@ package co.edu.unilibre.dto;
 
 public class UsuarioDTO {
 
-    private Long id;
-    private String nombre;
+    private int id;
+    private String nombreUsuario;
     private String correo;
-    private int saldo;
+    private double saldo;
 
-    public UsuarioDTO(Long id, String nombre, String correo, int saldo) {
-        this.id = id;
-        this.nombre = nombre;
-        this.correo = correo;
-        this.saldo = saldo;
-    }
-
-    //ENCAPSULAMIENTO
-
-    public Long obtenerId() {
+    public int obtenerId() {
         return id;
     }
 
-    public void modificarId(Long id) {
+    public void modificarId(int id) {
         this.id = id;
     }
 
-    public String obtenerNombre() {
-        return nombre;
+    public String obtenerNombreUsuario() {
+        return nombreUsuario;
     }
 
-    public void modificarNombre(String nombre) {
-        this.nombre = nombre;
+    public void modificarNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public String obtenerCorreo() {
@@ -40,11 +31,11 @@ public class UsuarioDTO {
         this.correo = correo;
     }
 
-    public int obtenerSaldo() {
+    public double obtenerSaldo() {
         return saldo;
     }
 
-    public void modificarSaldo(int saldo) {
+    public void modificarSaldo(double saldo) {
         this.saldo = saldo;
     }
 }

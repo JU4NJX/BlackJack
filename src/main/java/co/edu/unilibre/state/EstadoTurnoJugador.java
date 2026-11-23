@@ -2,18 +2,28 @@ package co.edu.unilibre.state;
 
 import co.edu.unilibre.model.Partida;
 
-public class EstadoTurnoJugador {
+public class EstadoTurnoJugador implements Estado {
 
-    public void iniciar(Partida partida){
+    @Override
+    public void iniciar(Partida partida) {
+        throw new IllegalStateException(
+                "La partida ya ha sido iniciada."
+        );
     }
 
-    public void pedirCarta(Partida partida , int indiceMano){
+    @Override
+    public void pedirCarta(Partida partida, int indiceMano) {
+        partida.pedirCarta(indiceMano);
     }
 
-    public void plantarse(Partida partida, int indiceMano){
+    @Override
+    public void plantarse(Partida partida, int indiceMano) {
+        partida.plantarse(indiceMano);
     }
 
-    public void ejecutarTurno(Partida partida){
+    @Override
+    public void ejecutarTurno(Partida partida) {
+        partida.modificarEstadoActual(new EstadoTurnoCrupier());
     }
-
 }
+

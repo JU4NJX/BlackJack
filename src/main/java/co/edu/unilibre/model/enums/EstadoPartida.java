@@ -1,10 +1,8 @@
 package co.edu.unilibre.model.enums;
 
 public enum EstadoPartida {
-
-    ESPERANDO_APUESTA,
+    INICIAL,
     TURNO_JUGADOR,
     TURNO_CRUPIER,
-    FINALIZADA;
-
+    FINALIZADA
 }

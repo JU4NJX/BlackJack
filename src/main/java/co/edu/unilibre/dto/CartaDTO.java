@@ -1,43 +1,41 @@
 package co.edu.unilibre.dto;
 
-import co.edu.unilibre.model.enums.Palo;
-import co.edu.unilibre.model.enums.ValorCarta;
-
 public class CartaDTO {
 
-    private Palo palo;
-    private ValorCarta valor;
-    private boolean oculta;
+    private String palo;
+    private String valor;
+    private String imagen;
+    private boolean visible;
 
-    public CartaDTO(Palo palo, ValorCarta valor) {
-        this.palo = palo;
-        this.valor = valor;
-        this.oculta = true;
-    }
-
-    //ENCAPSULAMIENTO
-
-    public Palo obtenerPalo() {
+    public String obtenerPalo() {
         return palo;
     }
 
-    public void modificarPalo(Palo palo) {
+    public void modificarPalo(String palo) {
         this.palo = palo;
     }
 
-    public ValorCarta obtenerValor() {
+    public String obtenerValor() {
         return valor;
     }
 
-    public void modificarValor(ValorCarta valor) {
+    public void modificarValor(String valor) {
         this.valor = valor;
     }
 
-    public boolean obtenerOculta() {
-        return oculta;
+    public String obtenerImagen() {
+        return imagen;
     }
 
-    public void modificarOculta(boolean oculta) {
-        this.oculta = oculta;
+    public void modificarImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
+    public boolean obtenerVisible() {
+        return visible;
+    }
+
+    public void modificarVisible(boolean visible) {
+        this.visible = visible;
     }
 }
