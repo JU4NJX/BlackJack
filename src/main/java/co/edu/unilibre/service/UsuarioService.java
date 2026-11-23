@@ -1,28 +1,84 @@
+
 package co.edu.unilibre.service;
 
 import co.edu.unilibre.dao.UsuarioDAO;
 import co.edu.unilibre.dto.UsuarioDTO;
+import co.edu.unilibre.model.Usuario;
+import co.edu.unilibre.util.Constantes;
+import co.edu.unilibre.util.Validador;
 
 public class UsuarioService {
 
     private UsuarioDAO usuarioDAO;
 
-    public UsuarioService(UsuarioDAO usuarioDAO){
+    public UsuarioService() {
+        this.usuarioDAO = new UsuarioDAO();
     }
 
-    public UsuarioDTO registarUsuario(String nombre, String correo){
-        return null;
+    public UsuarioDTO obtenerUsuario() {
+
+        Usuario usuario = usuarioDAO.buscarUsuarioUnico();
+
+        if (usuario == null) {
+            usuario = new Usuario(0, "Jugador", "jugador@blackjack.com", Constantes.SALDO_INICIAL, java.time.LocalDateTime.now());
+            usuarioDAO.guardar(usuario, null);
+        }
+
+        return convertirUsuarioDTO(usuario);
     }
 
-    public UsuarioDTO autenticarUsuario(String correo){
-        return null;
+    public double consultarSaldo(int idUsuario) {
+
+        if (idUsuario <= 0) {
+            throw new IllegalArgumentException(
+                    "El identificador del usuario no es válido."
+            );
+        }
+
+        Usuario usuario = usuarioDAO.buscarPorId(idUsuario);
+
+        if (usuario == null) {
+            throw new IllegalArgumentException(
+                    "El usuario no existe."
+            );
+        }
+
+        return usuario.obtenerSaldo();
     }
 
-    public UsuarioDTO obtenerUsuario(Long id){
-        return null;
+    public void actualizarSaldo(Usuario usuario) {
+
+        if (usuario == null) {
+            throw new IllegalArgumentException(
+                    "El usuario no puede ser nulo."
+            );
+        }
+
+        if (usuario.obtenerId() <= 0) {
+            throw new IllegalArgumentException(
+                    "El identificador del usuario no es válido."
+            );
+        }
+
+        if (usuario.obtenerSaldo() < 0
+                || !Double.isFinite(usuario.obtenerSaldo())) {
+            throw new IllegalArgumentException(
+                    "El saldo no es válido."
+            );
+        }
+
+        usuarioDAO.actualizarSaldo(usuario, null);
     }
 
-    public void actualizarSaldo(Long idUsuario, int saldo){
-    }
+    private UsuarioDTO convertirUsuarioDTO(Usuario usuario) {
 
+        UsuarioDTO dto = new UsuarioDTO();
+
+        dto.modificarId(usuario.obtenerId());
+        dto.modificarNombreUsuario(usuario.obtenerNombreUsuario());
+        dto.modificarCorreo(usuario.obtenerCorreo());
+        dto.modificarSaldo(usuario.obtenerSaldo());
+
+        return dto;
+    }
 }

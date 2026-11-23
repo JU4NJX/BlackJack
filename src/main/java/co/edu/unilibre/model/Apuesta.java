@@ -104,5 +104,3 @@ public class Apuesta {
         this.liquidada = liquidada;
     }
 }
-
-

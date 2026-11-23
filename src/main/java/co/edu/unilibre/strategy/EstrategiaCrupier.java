@@ -6,3 +6,4 @@ public interface EstrategiaCrupier {
 
     boolean debePedirCarta(Mano mano);
 }
+

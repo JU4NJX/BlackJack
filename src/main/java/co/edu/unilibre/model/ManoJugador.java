@@ -68,6 +68,10 @@ public class ManoJugador extends Mano {
         plantada = true;
     }
 
+    public boolean estaFinalizada() {
+        return plantada || superaVeintiuno() || tieneBlackjackNatural();
+    }
+
     private boolean finalizarPorBlackjack() {
         return tieneBlackjackNatural();
     }

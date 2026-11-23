@@ -1,4 +1,3 @@
-
 package co.edu.unilibre.model;
 
 import co.edu.unilibre.model.enums.TipoMovimiento;

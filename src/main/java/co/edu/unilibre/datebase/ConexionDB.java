@@ -1,3 +1,4 @@
+
 package co.edu.unilibre.datebase;
 
 import java.sql.Connection;
@@ -11,9 +12,13 @@ public class ConexionDB {
     private String clave;
 
     public ConexionDB() {
-        this.URL = "jdbc:postgresql://ep-weathered-voice-bek0iffz-pooler.c-9.us-east-2.aws.neon.tech/neondb?sslmode=require";
-        this.usuario = "neondb_owner";
-        this.clave = "npg_z7lBWgTj2SfV";
+        this.URL = System.getenv("DB_URL");
+        this.usuario = System.getenv("DB_USER");
+        this.clave = System.getenv("DB_PASSWORD");
+
+        if (URL == null || usuario == null || clave == null) {
+            throw new IllegalStateException("Faltan las variables de entorno de la base de datos.");
+        }
     }
 
     public String obtenerURL() {
@@ -42,10 +47,11 @@ public class ConexionDB {
 
     public Connection obtenerConexion() {
         try {
-            return DriverManager.getConnection(URL, usuario, clave);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al conectar con la base de datos Neon", e
+            return DriverManager.getConnection(
+                    URL, usuario, clave
             );
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al conectar con PostgreSQL.", e);
         }
     }
 
@@ -54,8 +60,7 @@ public class ConexionDB {
             try {
                 conexion.close();
             } catch (SQLException e) {
-                throw new RuntimeException("Error al cerrar la conexión", e
-                );
+                throw new RuntimeException("Error al cerrar la conexión.", e);
             }
         }
     }

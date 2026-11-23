@@ -2,9 +2,7 @@ package co.edu.unilibre.observer;
 
 import co.edu.unilibre.dto.PartidaDTO;
 
-public class Observador {
+public interface Observador {
 
-    public void actualizar(PartidaDTO partida){
-    }
-
+    void actualizar(PartidaDTO partida);
 }

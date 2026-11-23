@@ -21,34 +21,26 @@ public class MazoFactory {
 
     public Mazo crearMazo() {
         Mazo mazo = new Mazo();
-
         for (Palo palo : Palo.values()) {
             for (ValorCarta valor : ValorCarta.values()) {
-
                 Carta carta = cartaFactory.crearCarta(palo, valor);
-
                 mazo.agregarCarta(carta);
             }
         }
-
         mazo.barajar();
-
         return mazo;
     }
 
     // Métodos de encapsulamiento
 
-    public CartaFactory getCartaFactory() {
+    public CartaFactory obtenerCartaFactory() {
         return cartaFactory;
     }
 
-    public void setCartaFactory(CartaFactory cartaFactory) {
+    public void modificarCartaFactory(CartaFactory cartaFactory) {
         if (cartaFactory == null) {
-            throw new IllegalArgumentException(
-                    "La fábrica de cartas no puede ser nula."
-            );
+            throw new IllegalArgumentException("La fábrica de cartas no puede ser nula.");
         }
-
         this.cartaFactory = cartaFactory;
     }
 

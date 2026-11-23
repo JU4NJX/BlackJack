@@ -1,4 +1,3 @@
-
 package co.edu.unilibre.factory;
 
 import co.edu.unilibre.model.Carta;

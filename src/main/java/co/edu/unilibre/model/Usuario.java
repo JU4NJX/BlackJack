@@ -7,16 +7,13 @@ public class Usuario {
     private int id;
     private String nombreUsuario;
     private String correo;
-    private String claveHash;
     private double saldo;
     private LocalDateTime fechaRegistro;
 
-    public Usuario(int id, String nombreUsuario, String correo,
-                   String claveHash, double saldo, LocalDateTime fechaRegistro) {
+    public Usuario(int id, String nombreUsuario, String correo, double saldo, LocalDateTime fechaRegistro) {
         this.id = id;
         this.nombreUsuario = nombreUsuario;
         this.correo = correo;
-        this.claveHash = claveHash;
         this.saldo = saldo;
         this.fechaRegistro = fechaRegistro;
     }
@@ -75,14 +72,6 @@ public class Usuario {
 
     public void modificarCorreo(String correo) {
         this.correo = correo;
-    }
-
-    public String obtenerClaveHash() {
-        return claveHash;
-    }
-
-    public void modificarClaveHash(String claveHash) {
-        this.claveHash = claveHash;
     }
 
     public double obtenerSaldo() {

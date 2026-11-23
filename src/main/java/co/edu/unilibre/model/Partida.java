@@ -18,8 +18,13 @@ public class Partida {
     private boolean finalizada;
 
     public Partida(int id, Mazo mazo, Estado estadoActual) {
+
         if (mazo == null) {
             throw new IllegalArgumentException("El mazo no puede ser nulo.");
+        }
+
+        if (estadoActual == null) {
+            throw new IllegalArgumentException("El estado inicial no puede ser nulo.");
         }
 
         this.id = id;
@@ -35,51 +40,114 @@ public class Partida {
     // Métodos de negocio
 
     public void iniciar() {
-        if (finalizada) {
-            throw new IllegalStateException("La partida ya está finalizada.");
+
+        validarPartidaActiva();
+
+        if (fechaInicio != null) {
+            throw new IllegalStateException("La partida ya ha sido iniciada.");
         }
 
-        if (estadoActual == null) {
-            throw new IllegalStateException("No hay un estado asignado a la partida.");
-        }
+        fechaInicio = LocalDateTime.now();
 
         estadoActual.iniciar(this);
     }
 
-    public void pedirCarta(int indiceMano) {
-        validarIndiceMano(indiceMano);
+    public void agregarManoJugador(ManoJugador mano) {
 
-        if (estadoActual == null) {
-            throw new IllegalStateException("No hay un estado asignado a la partida.");
+        validarPartidaActiva();
+
+        if (mano == null) {
+            throw new IllegalArgumentException("La mano del jugador no puede ser nula.");
         }
+
+        if (!manosJugador.isEmpty()) {
+            throw new IllegalStateException("La mano inicial ya fue agregada.");
+        }
+
+        manosJugador.add(mano);
+    }
+
+    public void pedirCarta(int indiceMano) {
+
+        validarPartidaActiva();
+        validarIndiceMano(indiceMano);
 
         estadoActual.pedirCarta(this, indiceMano);
     }
 
-    public void plantarse(int indiceMano) {
-        validarIndiceMano(indiceMano);
+    public void pedirCartaDesdeEstado(int indiceMano) {
 
-        if (estadoActual == null) {
-            throw new IllegalStateException("No hay un estado asignado a la partida.");
-        }
-
-        estadoActual.plantarse(this, indiceMano);
-    }
-
-    public boolean doblarApuesta(int indiceMano) {
+        validarPartidaActiva();
         validarIndiceMano(indiceMano);
 
         ManoJugador mano = manosJugador.get(indiceMano);
 
-        if (!mano.puedeDoblar()) {
+        if (!mano.puedePedirCarta()) {
+            throw new IllegalStateException("Esta mano no puede recibir más cartas.");
+        }
+
+        if (mazo.estaVacio()) {
+            throw new IllegalStateException("No quedan cartas en el mazo.");
+        }
+
+        Carta carta = mazo.repartirCarta();
+
+        mano.agregarCarta(carta);
+
+        if (mano.superaVeintiuno()
+                || mano.calcularPuntuacion() == 21) {
+
+            mano.finalizarMano();
+        }
+    }
+
+    public void plantarse(int indiceMano) {
+
+        validarPartidaActiva();
+        validarIndiceMano(indiceMano);
+
+        estadoActual.plantarse(this, indiceMano);
+    }
+
+    public void plantarseDesdeEstado(int indiceMano) {
+
+        validarPartidaActiva();
+        validarIndiceMano(indiceMano);
+
+        ManoJugador mano = manosJugador.get(indiceMano);
+
+        if (!mano.puedePedirCarta()) {
+            throw new IllegalStateException("La mano ya no permite realizar esta acción.");
+        }
+
+        mano.plantarse();
+    }
+
+    public boolean doblarApuesta(int indiceMano) {
+
+        validarPartidaActiva();
+        validarIndiceMano(indiceMano);
+
+        ManoJugador mano = manosJugador.get(indiceMano);
+
+        if (!mano.puedeDoblar() || mazo.estaVacio()) {
             return false;
         }
 
         mano.doblar();
+
+        Carta carta = mazo.repartirCarta();
+
+        mano.agregarCarta(carta);
+        mano.finalizarMano();
+
         return true;
     }
 
     public boolean dividirMano() {
+
+        validarPartidaActiva();
+
         if (manosJugador.isEmpty()) {
             return false;
         }
@@ -90,52 +158,114 @@ public class Partida {
             return false;
         }
 
-        if (mazo.estaVacio()) {
+        if (mazo.cantidadCartas() < 2) {
             return false;
         }
 
-        Apuesta apuestaOriginal = manoOriginal.obtenerApuesta();
+        Apuesta apuestaOriginal =
+                manoOriginal.obtenerApuesta();
 
-        Apuesta nuevaApuesta = new Apuesta(apuestaOriginal.obtenerMontoInicial());
+        if (apuestaOriginal == null
+                || apuestaOriginal.estaLiquidada()) {
 
-        ManoJugador nuevaMano = new ManoJugador(nuevaApuesta);
+            return false;
+        }
 
-        Carta cartaSeparada = manoOriginal.obtenerCartas().get(1);
+        Carta cartaSeparada =
+                manoOriginal.obtenerCartas().get(1);
 
-        List<Carta> cartasOriginales = new ArrayList<>(manoOriginal.obtenerCartas());
+        boolean divisionAses =
+                manoOriginal.obtenerCartas().get(0).esAs()
+                        && cartaSeparada.esAs();
+
+        Apuesta nuevaApuesta =
+                new Apuesta(
+                        apuestaOriginal.obtenerMontoInicial()
+                );
+
+        ManoJugador nuevaMano =
+                new ManoJugador(nuevaApuesta);
+
+        List<Carta> cartasOriginales =
+                new ArrayList<>(manoOriginal.obtenerCartas());
+
         cartasOriginales.remove(1);
 
         manoOriginal.modificarCartas(cartasOriginales);
+
         nuevaMano.agregarCarta(cartaSeparada);
 
         manoOriginal.modificarDividida(true);
         nuevaMano.modificarDividida(true);
 
-        if (cartaSeparada.esAs() && manoOriginal.obtenerCartas().get(0).esAs()) {
+        // Cada mano recibe una carta adicional.
+
+        Carta cartaOriginal = mazo.repartirCarta();
+        Carta cartaNueva = mazo.repartirCarta();
+
+        manoOriginal.agregarCarta(cartaOriginal);
+        nuevaMano.agregarCarta(cartaNueva);
+
+        if (divisionAses) {
+
             manoOriginal.modificarAsDividido(true);
             nuevaMano.modificarAsDividido(true);
+
             manoOriginal.finalizarMano();
             nuevaMano.finalizarMano();
+
+        } else {
+
+            if (manoOriginal.superaVeintiuno()
+                    || manoOriginal.calcularPuntuacion() == 21) {
+
+                manoOriginal.finalizarMano();
+            }
+
+            if (nuevaMano.superaVeintiuno()
+                    || nuevaMano.calcularPuntuacion() == 21) {
+
+                nuevaMano.finalizarMano();
+            }
         }
 
         manosJugador.add(nuevaMano);
+
         return true;
     }
 
-    public void ejecutarTurnoCrupier() {
-        if (finalizada) {
-            throw new IllegalStateException("La partida ya está finalizada.");
+    public void pedirCartaCrupier() {
+
+        validarPartidaActiva();
+
+        if (mazo.estaVacio()) {
+            throw new IllegalStateException(
+                    "No quedan cartas en el mazo."
+            );
         }
 
-        if (estadoActual == null) {
-            throw new IllegalStateException("No hay un estado asignado a la partida.");
-        }
+        Carta carta = mazo.repartirCarta();
+
+        manoCrupier.agregarCarta(carta);
+    }
+
+    public void ejecutarTurnoCrupier() {
+
+        validarPartidaActiva();
 
         estadoActual.ejecutarTurno(this);
     }
 
+
+    public void ejecutarTurnoCrupierDesdeEstado() {
+
+        validarPartidaActiva();
+    }
+
     public void finalizar() {
+
         if (!finalizada) {
+
             finalizada = true;
             fechaFin = LocalDateTime.now();
         }
@@ -145,8 +275,18 @@ public class Partida {
         return finalizada;
     }
 
+    private void validarPartidaActiva() {
+
+        if (finalizada) {
+            throw new IllegalStateException("La partida ya está finalizada.");
+        }
+    }
+
     private void validarIndiceMano(int indiceMano) {
-        if (indiceMano < 0 || indiceMano >= manosJugador.size()) {
+
+        if (indiceMano < 0
+                || indiceMano >= manosJugador.size()) {
+
             throw new IndexOutOfBoundsException("El índice de la mano no es válido.");
         }
     }
@@ -182,9 +322,11 @@ public class Partida {
     }
 
     public void modificarMazo(Mazo mazo) {
+
         if (mazo == null) {
             throw new IllegalArgumentException("El mazo no puede ser nulo.");
         }
+
         this.mazo = mazo;
     }
 
@@ -193,9 +335,11 @@ public class Partida {
     }
 
     public void modificarManoCrupier(Mano manoCrupier) {
+
         if (manoCrupier == null) {
             throw new IllegalArgumentException("La mano del crupier no puede ser nula.");
         }
+
         this.manoCrupier = manoCrupier;
     }
 
@@ -203,10 +347,17 @@ public class Partida {
         return List.copyOf(manosJugador);
     }
 
-    public void modificarManosJugador(List<ManoJugador> manosJugador) {
+    public void modificarManosJugador(
+            List<ManoJugador> manosJugador) {
+
         if (manosJugador == null) {
             throw new IllegalArgumentException("La lista de manos no puede ser nula.");
         }
+
+        if (manosJugador.stream().anyMatch(mano -> mano == null)) {
+            throw new IllegalArgumentException("La lista no puede contener manos nulas.");
+        }
+
         this.manosJugador = new ArrayList<>(manosJugador);
     }
 
@@ -215,6 +366,11 @@ public class Partida {
     }
 
     public void modificarEstadoActual(Estado estadoActual) {
+
+        if (estadoActual == null) {
+            throw new IllegalArgumentException("El estado no puede ser nulo.");
+        }
+
         this.estadoActual = estadoActual;
     }
 
@@ -223,6 +379,15 @@ public class Partida {
     }
 
     public void modificarFinalizada(boolean finalizada) {
+
+        if (this.finalizada && !finalizada) {
+            throw new IllegalStateException("No se puede reabrir una partida finalizada.");
+        }
+
         this.finalizada = finalizada;
+
+        if (finalizada && fechaFin == null) {
+            fechaFin = LocalDateTime.now();
+        }
     }
 }

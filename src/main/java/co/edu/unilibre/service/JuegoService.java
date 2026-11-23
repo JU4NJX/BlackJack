@@ -1,10 +1,28 @@
 package co.edu.unilibre.service;
 
-import co.edu.unilibre.dto.CartaDTO;
 import co.edu.unilibre.dto.PartidaDTO;
+import co.edu.unilibre.dto.CartaDTO;
+
+import co.edu.unilibre.model.Partida;
+import co.edu.unilibre.model.Usuario;
+import co.edu.unilibre.model.Carta;
+import co.edu.unilibre.model.Mano;
+import co.edu.unilibre.model.ManoJugador;
+import co.edu.unilibre.model.Apuesta;
+
+import co.edu.unilibre.model.enums.EstadoPartida;
+import co.edu.unilibre.model.enums.Resultado;
+
 import co.edu.unilibre.factory.MazoFactory;
-import co.edu.unilibre.model.*;
+
 import co.edu.unilibre.strategy.EstrategiaCrupier;
+
+import co.edu.unilibre.state.EstadoInicial;
+import co.edu.unilibre.state.EstadoTurnoCrupier;
+import co.edu.unilibre.state.EstadoFinalizado;
+
+import co.edu.unilibre.observer.Observador;
+import co.edu.unilibre.observer.Sujeto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,27 +33,45 @@ public class JuegoService implements Sujeto {
     private EstrategiaCrupier estrategiaCrupier;
     private MazoFactory mazoFactory;
 
-    private ApuestaService apuestaService;
-    private PuntuacionService puntuacionService;
-    private UsuarioService usuarioService;
-
     private Partida partidaActual;
     private Usuario usuarioActual;
+
+    private PuntuacionService puntuacionService;
+    private ApuestaService apuestaService;
+
+    public JuegoService(
+            EstrategiaCrupier estrategiaCrupier,
+            MazoFactory mazoFactory) {
+
+        this(
+                estrategiaCrupier,
+                mazoFactory,
+                new ApuestaService()
+        );
+    }
 
     public JuegoService(
             EstrategiaCrupier estrategiaCrupier,
             MazoFactory mazoFactory,
-            ApuestaService apuestaService,
-            PuntuacionService puntuacionService,
-            UsuarioService usuarioService) {
+            ApuestaService apuestaService) {
+
+        if (estrategiaCrupier == null
+                || mazoFactory == null
+                || apuestaService == null) {
+
+            throw new IllegalArgumentException(
+                    "Las dependencias no pueden ser nulas."
+            );
+        }
 
         this.observadores = new ArrayList<>();
         this.estrategiaCrupier = estrategiaCrupier;
         this.mazoFactory = mazoFactory;
+        this.puntuacionService = new PuntuacionService();
         this.apuestaService = apuestaService;
-        this.puntuacionService = puntuacionService;
-        this.usuarioService = usuarioService;
     }
+
+    // Iniciar partida
 
     public PartidaDTO iniciarPartida(Usuario usuario, double apuesta) {
 
@@ -44,138 +80,244 @@ public class JuegoService implements Sujeto {
         }
 
         if (partidaActual != null && !partidaActual.estaFinalizada()) {
-            throw new IllegalStateException("Ya existe una partida en curso.");
+            throw new IllegalStateException("El usuario ya tiene una partida en curso.");
         }
 
-        if (!apuestaService.validarApuesta(usuario.obtenerSaldoPuntos(), apuesta)) {
-            throw new IllegalArgumentException("La apuesta no es válida.");
+        if (!apuestaService.validarApuesta(usuario.obtenerSaldo(), apuesta)) {
+            throw new IllegalArgumentException("La apuesta no es válida o el saldo es insuficiente.");
         }
+
+        Apuesta nuevaApuesta = new Apuesta(apuesta);
+
+        // Crear la partida antes de registrar la apuesta.
+        Partida nuevaPartida = new Partida(0, mazoFactory.crearMazo(), new EstadoInicial());
+
+        // Crear y agregar la mano inicial.
+        ManoJugador manoJugador = new ManoJugador(nuevaApuesta);
+
+        nuevaPartida.agregarManoJugador(manoJugador);
+
+        // Iniciar la partida para establecer la fecha de inicio.
+        nuevaPartida.iniciar();
+
+        // Descontar la apuesta y guardar el registro pendiente de liquidación en la base de datos.
+        apuestaService.registrarApuesta(nuevaApuesta, usuario, nuevaPartida);
 
         this.usuarioActual = usuario;
-
-        Mazo mazo = mazoFactory.crearMazo();
-
-        partidaActual = new Partida(mazo);
-
-        apuestaService.registrarApuesta(
-                new Apuesta(apuesta)
-        );
-
-        partidaActual.iniciar();
-
-        PartidaDTO partidaDTO = construirPartidaDTO();
+        this.partidaActual = nuevaPartida;
 
         notificarObservadores();
 
-        return partidaDTO;
+        return construirPartidaDTO();
     }
+
+    // Pedir carta
 
     public PartidaDTO pedirCarta(int indiceMano) {
 
         validarPartidaActiva();
+        validarTurnoJugador();
 
         partidaActual.pedirCarta(indiceMano);
 
-        if (partidaActual.estaFinalizada()) {
-            finalizarPartida();
-        }
+        notificarObservadores();
 
-        return construirYNotificar();
+        return construirPartidaDTO();
     }
+
+    // Plantarse
 
     public PartidaDTO plantarse(int indiceMano) {
 
         validarPartidaActiva();
+        validarTurnoJugador();
 
         partidaActual.plantarse(indiceMano);
 
-        return construirYNotificar();
+        notificarObservadores();
+
+        return construirPartidaDTO();
     }
+
+    // Doblar apuesta
 
     public PartidaDTO doblarApuesta(int indiceMano) {
 
         validarPartidaActiva();
+        validarTurnoJugador();
 
-        ManoJugador mano = partidaActual.obtenerManosJugador().get(indiceMano);
+        List<ManoJugador> manos = partidaActual.obtenerManosJugador();
+
+        validarIndiceMano(indiceMano, manos);
+
+        ManoJugador mano = manos.get(indiceMano);
 
         if (!mano.puedeDoblar()) {
-            throw new IllegalStateException(
-                    "No es posible doblar la apuesta."
-            );
+            throw new IllegalStateException("Esta mano no permite doblar.");
         }
 
-        if (!apuestaService.procesarDobleApuesta(mano.obtenerApuesta())) {
-            throw new IllegalStateException(
-                    "No hay saldo suficiente para doblar."
-            );
+        // Descontar la apuesta adicional.
+        if (!apuestaService.procesarDobleApuesta(mano.obtenerApuesta(), usuarioActual)) {
+            throw new IllegalStateException("No se pudo procesar la doble apuesta.");
         }
 
-        partidaActual.doblarApuesta(indiceMano);
+        // Aumentar la apuesta en el modelo.
+        mano.doblar();
 
-        return construirYNotificar();
+        // Recibir una única carta adicional.
+        partidaActual.pedirCarta(indiceMano);
+
+        // Después de doblar, la mano queda plantada.
+        mano.plantarse();
+
+        notificarObservadores();
+
+        return construirPartidaDTO();
     }
+
+    // Dividir mano
 
     public PartidaDTO dividirMano() {
 
         validarPartidaActiva();
+        validarTurnoJugador();
 
-        if (!partidaActual.dividirMano()) {
-            throw new IllegalStateException(
-                    "No es posible dividir la mano."
-            );
+        List<ManoJugador> manos = partidaActual.obtenerManosJugador();
+
+        if (manos.isEmpty()) {throw new IllegalStateException("No existe una mano para dividir.");}
+
+        ManoJugador mano = manos.get(0);
+
+        if (!mano.puedeDividir()) {throw new IllegalStateException("La mano no permite dividir.");}
+
+        // Descontar la apuesta adicional.
+        if (!apuestaService.procesarSplit(mano.obtenerApuesta(), usuarioActual)) {
+            throw new IllegalStateException("No se pudo procesar la división.");
         }
 
-        ManoJugador primeraMano =
-                partidaActual.getManosJugador().get(0);
+        if (!partidaActual.dividirMano()) {
+            throw new IllegalStateException("No se pudo dividir la mano.");
+        }
 
-        apuestaService.procesarSplit(primeraMano.getApuesta());
+        notificarObservadores();
 
-        return construirYNotificar();
+        return construirPartidaDTO();
     }
+
+    // Ejecutar turno del crupier
 
     public PartidaDTO ejecutarTurnoCrupier() {
 
         validarPartidaActiva();
 
-        Mano manoCrupier = partidaActual.getManoCrupier();
+        List<ManoJugador> manos = partidaActual.obtenerManosJugador();
 
-        while (estrategiaCrupier.debePedirCarta(manoCrupier)) {
-            partidaActual.getMazo().repartirCarta();
-            manoCrupier.agregarCarta(
-                    partidaActual.getMazo().repartirCarta()
-            );
+        if (manos.isEmpty()) {
+            throw new IllegalStateException("La partida no tiene manos de jugador.");
         }
 
-        partidaActual.ejecutarTurnoCrupier();
+        // Todas las manos deben estar finalizadas.
+        for (ManoJugador mano : manos) {
 
-        return construirYNotificar();
+            if (!mano.estaFinalizada()) {
+                throw new IllegalStateException("Todas las manos del jugador deben finalizar antes del turno del crupier.");}
+        }
+
+        // Ejecutar la estrategia del crupier.
+        Mano manoCrupier = partidaActual.obtenerManoCrupier();
+
+        while (estrategiaCrupier.debePedirCarta(manoCrupier)) {
+
+            if (partidaActual.obtenerMazo().estaVacio()) {
+                break;
+            }
+
+            partidaActual.pedirCartaCrupier();
+        }
+
+        // Cambiar al estado del crupier.
+        partidaActual.modificarEstadoActual(
+                new EstadoTurnoCrupier()
+        );
+
+        partidaActual.ejecutarTurnoCrupierDesdeEstado();
+
+        // Asignar resultados y liquidar la partida.
+        finalizarPartida();
+
+        return construirPartidaDTO();
     }
+
+    // Finalizar y liquidar partida
 
     public PartidaDTO finalizarPartida() {
 
         validarPartidaActiva();
 
+        List<ManoJugador> manos = partidaActual.obtenerManosJugador();
+
+        Mano manoCrupier = partidaActual.obtenerManoCrupier();
+
+        // Determinar el resultado de cada mano.
+        for (ManoJugador mano : manos) {
+            Resultado resultado = determinarResultadoMano(mano, manoCrupier);
+            mano.modificarResultado(resultado);
+        }
+
+        // Marcar la partida como finalizada.
         partidaActual.finalizar();
 
-        apuestaService.liquidarPartida(
-                partidaActual,
-                usuarioActual
+        partidaActual.modificarEstadoActual(
+                new EstadoFinalizado()
         );
 
-        PartidaDTO partidaDTO = construirPartidaDTO();
+        try {
+
+            // Liquidar todas las apuestas y actualizar
+            // saldo, movimientos e historial en la base de datos.
+            apuestaService.liquidarPartida(partidaActual, usuarioActual);
+
+        } catch (RuntimeException e) {
+
+            // Si la liquidación falla, permitir reintentarla.
+            partidaActual.modificarFinalizada(false);
+            partidaActual.modificarFechaFin(null);
+            partidaActual.modificarEstadoActual(new EstadoTurnoCrupier());
+            throw e;
+        }
 
         notificarObservadores();
 
-        return partidaDTO;
+        return construirPartidaDTO();
     }
+
+    // Determinar resultado individual de una mano
+
+    private Resultado determinarResultadoMano(ManoJugador mano, Mano manoCrupier) {
+
+        // Una mano dividida no puede obtener premio de blackjack.
+        if (mano.obtenerDividida()) {
+
+            // Un blackjack natural del crupier vence a un 21
+            // conseguido mediante división.
+            if (puntuacionService.tieneBlackjack(manoCrupier)) {
+                return Resultado.PERDIDA;
+            }
+
+            // Comparar puntuaciones sin aplicar premio de blackjack.
+            return puntuacionService.compararPuntuaciones(mano, manoCrupier);
+        }
+
+        return puntuacionService.determinarResultado(mano, manoCrupier);
+    }
+
+    // Agregar observador
 
     @Override
     public void agregarObservador(Observador observador) {
 
         if (observador == null) {
-            throw new IllegalArgumentException(
-                    "El observador no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El observador no puede ser nulo.");
         }
 
         if (!observadores.contains(observador)) {
@@ -183,96 +325,141 @@ public class JuegoService implements Sujeto {
         }
     }
 
+    // Eliminar observador
+
     @Override
     public void eliminarObservador(Observador observador) {
         observadores.remove(observador);
     }
 
+    // Notificar observadores
+
     @Override
     public void notificarObservadores() {
 
-        PartidaDTO partidaDTO = construirPartidaDTO();
+        if (partidaActual == null || usuarioActual == null) {
+            return;
+        }
 
-        for (Observador observador : observadores) {
-            observador.actualizar(partidaDTO);
+        PartidaDTO dto = construirPartidaDTO();
+
+        for (Observador observador : new ArrayList<>(observadores)) {
+            observador.actualizar(dto);
         }
     }
+
+    // Validar partida activa
 
     private void validarPartidaActiva() {
 
         if (partidaActual == null || partidaActual.estaFinalizada()) {
-            throw new IllegalStateException(
-                    "No existe una partida activa."
-            );
+            throw new IllegalStateException("No existe una partida activa.");}
+    }
+
+    // Validar turno del jugador
+
+    private void validarTurnoJugador() {
+
+        if (partidaActual.obtenerEstadoActual() instanceof EstadoTurnoCrupier) {
+
+            throw new IllegalStateException("No es el turno del jugador.");
+        }
+
+        if (partidaActual.obtenerEstadoActual()
+                instanceof EstadoFinalizado) {
+
+            throw new IllegalStateException("La partida ya ha finalizado.");
         }
     }
 
-    private PartidaDTO construirYNotificar() {
+    // Validar índice de mano
 
-        PartidaDTO partidaDTO = construirPartidaDTO();
+    private void validarIndiceMano(
+            int indice,
+            List<ManoJugador> manos) {
 
-        notificarObservadores();
-
-        return partidaDTO;
+        if (indice < 0 || indice >= manos.size()) {
+            throw new IllegalArgumentException("El índice de la mano no es válido.");}
     }
+
+    // Construir DTO
 
     private PartidaDTO construirPartidaDTO() {
 
         PartidaDTO dto = new PartidaDTO();
 
-        if (partidaActual == null) {
-            return dto;
+        dto.modificarId(partidaActual.obtenerId());
+
+        List<ManoJugador> manos = partidaActual.obtenerManosJugador();
+
+        List<List<CartaDTO>> manosDTO = new ArrayList<>();
+
+        List<CartaDTO> cartasJugador = new ArrayList<>();
+
+        int puntuacionJugador = 0;
+        double apuestaTotal = 0;
+
+        for (ManoJugador mano : manos) {
+
+            List<CartaDTO> cartasMano = new ArrayList<>();
+
+            for (Carta carta : mano.obtenerCartas()) {
+
+                cartasMano.add(convertirCartaDTO(carta, true));
+            }
+
+            manosDTO.add(cartasMano);
+            cartasJugador.addAll(cartasMano);
+
+            puntuacionJugador += mano.calcularPuntuacion();
+
+            apuestaTotal += mano.obtenerApuesta().obtenerMontoTotal();
         }
 
-        dto.id = partidaActual.getId();
+        List<CartaDTO> cartasCrupier = new ArrayList<>();
 
-        dto.cartasCrupier = convertirCartas(
-                partidaActual.getManoCrupier().obtenerCartas()
+        Mano manoCrupier = partidaActual.obtenerManoCrupier();
+
+        for (int i = 0;
+             i < manoCrupier.obtenerCartas().size(); i++) {
+            Carta carta = manoCrupier.obtenerCartas().get(i);
+            boolean visible = i != 1 || partidaActual.estaFinalizada();
+            cartasCrupier.add(convertirCartaDTO(carta, visible));
+        }
+
+        dto.modificarCartasJugador(cartasJugador);
+        dto.modificarCartasCrupier(cartasCrupier);
+        dto.modificarManosJugador(manosDTO);
+
+        dto.modificarPuntuacionJugador(puntuacionJugador);
+
+        dto.modificarPuntuacionCrupier(partidaActual.estaFinalizada() ? puntuacionService.calcularPuntuacion(manoCrupier) : 0);
+
+        dto.modificarSaldoActual(usuarioActual.obtenerSaldo());
+        dto.modificarApuestaTotal(apuestaTotal);
+
+        dto.modificarEstado(partidaActual.estaFinalizada() ? EstadoPartida.FINALIZADA : EstadoPartida.TURNO_JUGADOR
         );
-
-        dto.puntuacionCrupier =
-                puntuacionService.calcularPuntuacion(
-                        partidaActual.getManoCrupier()
-                );
-
-        dto.cartasJugador = new ArrayList<>();
-        dto.manosJugador = new ArrayList<>();
-
-        for (ManoJugador mano :
-                partidaActual.getManosJugador()) {
-
-            List<CartaDTO> cartas =
-                    convertirCartas(mano.obtenerCartas());
-
-            dto.manosJugador.add(cartas);
-
-            dto.cartasJugador.addAll(cartas);
-
-            dto.puntuacionJugador +=
-                    puntuacionService.calcularPuntuacion(mano);
-        }
-
-        dto.estado = partidaActual.getEstadoActual();
-
-        dto.saldoActual = usuarioActual.getSaldo();
 
         return dto;
     }
 
-    private List<CartaDTO> convertirCartas(List<Carta> cartas) {
+    // Convertir Carta a CartaDTO
 
-        List<CartaDTO> cartasDTO = new ArrayList<>();
+    private CartaDTO convertirCartaDTO(Carta carta, boolean visible) {
 
-        for (Carta carta : cartas) {
+        CartaDTO dto = new CartaDTO();
 
-            CartaDTO dto = new CartaDTO();
+        dto.modificarPalo(carta.obtenerPalo().name());
 
-            dto.palo = carta.getPalo().name();
-            dto.valor = carta.getValor().name();
+        dto.modificarValor(carta.obtenerValorCarta().name());
 
-            cartasDTO.add(dto);
+        dto.modificarVisible(visible);
+
+        if (visible) {
+
+            dto.modificarImagen(carta.obtenerPalo().name().toLowerCase() + "_" + carta.obtenerValorCarta().name().toLowerCase() + ".png");
         }
-
-        return cartasDTO;
+        return dto;
     }
 }
