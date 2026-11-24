@@ -2,7 +2,7 @@ package co.edu.unilibre.service;
 
 import co.edu.unilibre.model.Mano;
 import co.edu.unilibre.model.ManoJugador;
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 public class PuntuacionService {
 
@@ -26,7 +26,7 @@ public class PuntuacionService {
         return mano.tieneBlackjackNatural();
     }
 
-    public Resultado determinarResultado(
+    public Resultados determinarResultado(
             ManoJugador jugador,
             Mano crupier) {
 
@@ -41,33 +41,33 @@ public class PuntuacionService {
 
         // Ambos tienen blackjack natural.
         if (blackjackJugador && blackjackCrupier) {
-            return Resultado.EMPATE;
+            return Resultados.EMPATE;
         }
 
         // El jugador tiene blackjack natural.
         if (blackjackJugador) {
-            return Resultado.BLACKJACK;
+            return Resultados.BLACKJACK;
         }
 
         // El crupier tiene blackjack natural.
         if (blackjackCrupier) {
-            return Resultado.PERDIDA;
+            return Resultados.PERDIDA;
         }
 
         // El jugador supera los 21 puntos.
         if (jugador.superaVeintiuno()) {
-            return Resultado.PERDIDA;
+            return Resultados.PERDIDA;
         }
 
         // El crupier supera los 21 puntos.
         if (crupier.superaVeintiuno()) {
-            return Resultado.GANADA;
+            return Resultados.GANADA;
         }
 
         return compararPuntuaciones(jugador, crupier);
     }
 
-    public Resultado compararPuntuaciones(
+    public Resultados compararPuntuaciones(
             Mano jugador,
             Mano crupier) {
 
@@ -81,21 +81,21 @@ public class PuntuacionService {
         int puntuacionCrupier = calcularPuntuacion(crupier);
 
         if (puntuacionJugador > 21) {
-            return Resultado.PERDIDA;
+            return Resultados.PERDIDA;
         }
 
         if (puntuacionCrupier > 21) {
-            return Resultado.GANADA;
+            return Resultados.GANADA;
         }
 
         if (puntuacionJugador > puntuacionCrupier) {
-            return Resultado.GANADA;
+            return Resultados.GANADA;
         }
 
         if (puntuacionJugador < puntuacionCrupier) {
-            return Resultado.PERDIDA;
+            return Resultados.PERDIDA;
         }
 
-        return Resultado.EMPATE;
+        return Resultados.EMPATE;
     }
 }

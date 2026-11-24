@@ -162,32 +162,19 @@ public class Partida {
             return false;
         }
 
-        Apuesta apuestaOriginal =
-                manoOriginal.obtenerApuesta();
+        Apuesta apuestaOriginal = manoOriginal.obtenerApuesta();
 
-        if (apuestaOriginal == null
-                || apuestaOriginal.estaLiquidada()) {
+        if (apuestaOriginal == null || apuestaOriginal.estaLiquidada()) {return false;}
 
-            return false;
-        }
+        Carta cartaSeparada = manoOriginal.obtenerCartas().get(1);
 
-        Carta cartaSeparada =
-                manoOriginal.obtenerCartas().get(1);
+        boolean divisionAses = manoOriginal.obtenerCartas().get(0).esAs() && cartaSeparada.esAs();
 
-        boolean divisionAses =
-                manoOriginal.obtenerCartas().get(0).esAs()
-                        && cartaSeparada.esAs();
+        Apuesta nuevaApuesta = new Apuesta(apuestaOriginal.obtenerMontoInicial());
 
-        Apuesta nuevaApuesta =
-                new Apuesta(
-                        apuestaOriginal.obtenerMontoInicial()
-                );
+        ManoJugador nuevaMano = new ManoJugador(nuevaApuesta);
 
-        ManoJugador nuevaMano =
-                new ManoJugador(nuevaApuesta);
-
-        List<Carta> cartasOriginales =
-                new ArrayList<>(manoOriginal.obtenerCartas());
+        List<Carta> cartasOriginales = new ArrayList<>(manoOriginal.obtenerCartas());
 
         cartasOriginales.remove(1);
 
@@ -216,15 +203,11 @@ public class Partida {
 
         } else {
 
-            if (manoOriginal.superaVeintiuno()
-                    || manoOriginal.calcularPuntuacion() == 21) {
-
+            if (manoOriginal.superaVeintiuno() || manoOriginal.calcularPuntuacion() == 21) {
                 manoOriginal.finalizarMano();
             }
 
-            if (nuevaMano.superaVeintiuno()
-                    || nuevaMano.calcularPuntuacion() == 21) {
-
+            if (nuevaMano.superaVeintiuno() || nuevaMano.calcularPuntuacion() == 21) {
                 nuevaMano.finalizarMano();
             }
         }

@@ -1,6 +1,6 @@
 package co.edu.unilibre.model.enums;
 
-public enum Resultado {
+public enum Resultados {
     GANADA,
     PERDIDA,
     EMPATE,

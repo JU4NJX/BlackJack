@@ -18,9 +18,13 @@ public class UsuarioDAO {
         this.conexionDB = new ConexionDB();
     }
 
-    // =========================================
-    // GUARDAR USUARIO
-    // =========================================
+    protected UsuarioDAO(boolean modoPrueba) {
+        if (modoPrueba) {
+            this.conexionDB = null;
+        } else {
+            this.conexionDB = new ConexionDB();
+        }
+    }
 
     public void guardar(Usuario usuario, Connection conexion) {
 
@@ -89,10 +93,6 @@ public class UsuarioDAO {
         }
     }
 
-    // =========================================
-    // BUSCAR USUARIO ÚNICO
-    // =========================================
-
     public Usuario buscarUsuarioUnico() {
 
         String sql = "SELECT * FROM usuarios ORDER BY id ASC LIMIT 1";
@@ -115,10 +115,6 @@ public class UsuarioDAO {
             );
         }
     }
-
-    // =========================================
-    // BUSCAR USUARIO POR CORREO
-    // =========================================
 
     public Usuario buscarPorCorreo(String correo) {
 
@@ -147,9 +143,6 @@ public class UsuarioDAO {
         return null;
     }
 
-    // =========================================
-    // BUSCAR USUARIO POR ID
-    // =========================================
 
     public Usuario buscarPorId(int id) {
 
@@ -178,9 +171,6 @@ public class UsuarioDAO {
         return null;
     }
 
-    // =========================================
-    // ACTUALIZAR SALDO
-    // =========================================
 
     public void actualizarSaldo(Usuario usuario, Connection conexion) {
 
@@ -238,10 +228,6 @@ public class UsuarioDAO {
             }
         }
     }
-
-    // =========================================
-    // MAPEAR RESULTADO A USUARIO
-    // =========================================
 
     private Usuario mapearUsuario(ResultSet resultado)
             throws SQLException {

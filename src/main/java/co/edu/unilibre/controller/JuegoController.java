@@ -1,43 +1,46 @@
 package co.edu.unilibre.controller;
 
-import co.edu.unilibre.dto.PartidaDTO;
 import co.edu.unilibre.service.JuegoService;
-import co.edu.unilibre.view.VentanaPrincipal;
 
 public class JuegoController {
 
     private JuegoService juegoService;
-    private VentanaPrincipal ventanaPrincipal;
 
-    public JuegoController(JuegoService juegoService, VentanaPrincipal ventanaPrincipal){
+    public JuegoController(JuegoService juegoService) {
+
+        if (juegoService == null) {
+            throw new IllegalArgumentException("El servicio de juego no puede ser nulo.");
+        }
         this.juegoService = juegoService;
-        this.ventanaPrincipal = ventanaPrincipal;
     }
 
-    public void iniciarPartida(int apuesta){
-        return ;
+    // Iniciar partida
+
+    public void iniciarPartida(double apuesta) {
+        juegoService.iniciarPartida(apuesta);
     }
 
-    public void pedirCarta(int indeceMano){
-        return;
+    // Pedir carta
+
+    public void pedirCarta(int indiceMano) {
+        juegoService.pedirCarta(indiceMano);
     }
 
-    public void pplantarse(int indeceMano){
-        return;
+    // Plantarse
+
+    public void plantarse(int indiceMano) {
+        juegoService.plantarse(indiceMano);
     }
 
-    public void doblarApuesta(int indeceMano){
-        return;
+    // Doblar apuesta
+
+    public void doblarApuesta(int indiceMano) {
+        juegoService.doblarApuesta(indiceMano);
     }
 
-    public void dividirMano(int indeceMano){
-        return;
-    }
+    // Dividir mano
 
-    public PartidaDTO obtenerPartidaActual(){
-        return null;
-    }
-    public void finalizarPartida(){
-        return;
+    public void dividirMano() {
+        juegoService.dividirMano();
     }
 }

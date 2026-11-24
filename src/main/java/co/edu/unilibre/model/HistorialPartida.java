@@ -1,6 +1,6 @@
 package co.edu.unilibre.model;
 
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 import java.time.LocalDateTime;
 
@@ -8,7 +8,7 @@ public class HistorialPartida {
 
     private int id;
     private LocalDateTime fecha;
-    private Resultado resultado;
+    private Resultados resultado;
     private double apuestaTotal;
     private double puntosGanados;
     private double puntosPerdidos;
@@ -27,7 +27,7 @@ public class HistorialPartida {
 
     // Métodos de negocio
 
-    public void registrarResultado(Resultado resultado) {
+    public void registrarResultado(Resultados resultado) {
         if (resultado == null) {
             throw new IllegalArgumentException("El resultado no puede ser nulo.");
         }
@@ -57,7 +57,7 @@ public class HistorialPartida {
         return puntosGanados - puntosPerdidos;
     }
 
-    private double calcularRetorno(Resultado resultado) {
+    private double calcularRetorno(Resultados resultado) {
         switch (resultado) {
             case GANADA:
                 return apuestaTotal * 2.0;
@@ -86,11 +86,11 @@ public class HistorialPartida {
         this.fecha = fecha;
     }
 
-    public Resultado obtenerResultado() {
+    public Resultados obtenerResultado() {
         return resultado;
     }
 
-    public void modificarResultado(Resultado resultado) {
+    public void modificarResultado(Resultados resultado) {
         this.resultado = resultado;
     }
 

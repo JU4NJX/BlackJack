@@ -1,28 +1,31 @@
 package co.edu.unilibre.controller;
 
 import co.edu.unilibre.dto.UsuarioDTO;
+import co.edu.unilibre.model.Usuario;
 import co.edu.unilibre.service.UsuarioService;
-
-import java.util.stream.Stream;
 
 public class UsuarioController {
 
     private UsuarioService usuarioService;
 
     public UsuarioController(UsuarioService usuarioService) {
+        if (usuarioService == null) {
+            throw new IllegalArgumentException(
+                    "El servicio de usuario no puede ser nulo."
+            );
+        }
         this.usuarioService = usuarioService;
     }
 
-    public UsuarioDTO registarUsuario(String nombre, String coreo){
-        return null;
+    public UsuarioDTO obtenerUsuario() {
+        return usuarioService.obtenerUsuario();
     }
 
-    public UsuarioDTO iniciarSesion(String correo){
-        return null;
+    public double consultarSaldo(int idUsuario) {
+        return usuarioService.consultarSaldo(idUsuario);
     }
 
-    public UsuarioDTO obtenerUsuario(Long id){
-        return null;
+    public void actualizarSaldo(Usuario usuario) {
+        usuarioService.actualizarSaldo(usuario);
     }
-
 }

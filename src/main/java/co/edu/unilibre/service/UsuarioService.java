@@ -1,11 +1,9 @@
-
 package co.edu.unilibre.service;
 
 import co.edu.unilibre.dao.UsuarioDAO;
 import co.edu.unilibre.dto.UsuarioDTO;
 import co.edu.unilibre.model.Usuario;
 import co.edu.unilibre.util.Constantes;
-import co.edu.unilibre.util.Validador;
 
 public class UsuarioService {
 
@@ -15,32 +13,46 @@ public class UsuarioService {
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    public UsuarioService(UsuarioDAO usuarioDAO) {
+        if (usuarioDAO == null) {
+            throw new IllegalArgumentException("El DAO no puede ser nulo.");
+        }
+        this.usuarioDAO = usuarioDAO;
+    }
+
     public UsuarioDTO obtenerUsuario() {
+        Usuario usuario = obtenerUsuarioModelo();
+        return convertirUsuarioDTO(usuario);
+    }
+
+    public Usuario obtenerUsuarioModelo() {
 
         Usuario usuario = usuarioDAO.buscarUsuarioUnico();
 
         if (usuario == null) {
+
             usuario = new Usuario(0, "Jugador", "jugador@blackjack.com", Constantes.SALDO_INICIAL, java.time.LocalDateTime.now());
+
             usuarioDAO.guardar(usuario, null);
+
+            if (usuario.obtenerId() <= 0) {
+                throw new IllegalStateException("No fue posible crear el usuario predeterminado.");
+            }
         }
 
-        return convertirUsuarioDTO(usuario);
+        return usuario;
     }
 
     public double consultarSaldo(int idUsuario) {
 
         if (idUsuario <= 0) {
-            throw new IllegalArgumentException(
-                    "El identificador del usuario no es válido."
-            );
+            throw new IllegalArgumentException("El identificador del usuario no es válido.");
         }
 
         Usuario usuario = usuarioDAO.buscarPorId(idUsuario);
 
         if (usuario == null) {
-            throw new IllegalArgumentException(
-                    "El usuario no existe."
-            );
+            throw new IllegalArgumentException("El usuario no existe.");
         }
 
         return usuario.obtenerSaldo();
@@ -49,22 +61,15 @@ public class UsuarioService {
     public void actualizarSaldo(Usuario usuario) {
 
         if (usuario == null) {
-            throw new IllegalArgumentException(
-                    "El usuario no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El usuario no puede ser nulo.");
         }
 
         if (usuario.obtenerId() <= 0) {
-            throw new IllegalArgumentException(
-                    "El identificador del usuario no es válido."
-            );
+            throw new IllegalArgumentException("El identificador del usuario no es válido.");
         }
 
-        if (usuario.obtenerSaldo() < 0
-                || !Double.isFinite(usuario.obtenerSaldo())) {
-            throw new IllegalArgumentException(
-                    "El saldo no es válido."
-            );
+        if (usuario.obtenerSaldo() < 0 || !Double.isFinite(usuario.obtenerSaldo())) {
+            throw new IllegalArgumentException("El saldo no es válido.");
         }
 
         usuarioDAO.actualizarSaldo(usuario, null);

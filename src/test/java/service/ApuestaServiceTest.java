@@ -1,7 +1,7 @@
 package service;
 
 import co.edu.unilibre.model.Apuesta;
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 import co.edu.unilibre.service.ApuestaService;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,7 +102,7 @@ class ApuestaServiceTest {
 
         double retorno = apuestaService.calcularRetorno(
                 apuesta,
-                Resultado.GANADA
+                Resultados.GANADA
         );
 
         assertEquals(200.0, retorno, 0.001);
@@ -115,7 +115,7 @@ class ApuestaServiceTest {
 
         double retorno = apuestaService.calcularRetorno(
                 apuesta,
-                Resultado.BLACKJACK
+                Resultados.BLACKJACK
         );
 
         assertEquals(250.0, retorno, 0.001);
@@ -128,7 +128,7 @@ class ApuestaServiceTest {
 
         double retorno = apuestaService.calcularRetorno(
                 apuesta,
-                Resultado.EMPATE
+                Resultados.EMPATE
         );
 
         assertEquals(100.0, retorno, 0.001);
@@ -141,7 +141,7 @@ class ApuestaServiceTest {
 
         double retorno = apuestaService.calcularRetorno(
                 apuesta,
-                Resultado.PERDIDA
+                Resultados.PERDIDA
         );
 
         assertEquals(0.0, retorno, 0.001);
@@ -154,7 +154,7 @@ class ApuestaServiceTest {
                 IllegalArgumentException.class,
                 () -> apuestaService.calcularRetorno(
                         null,
-                        Resultado.GANADA
+                        Resultados.GANADA
                 )
         );
     }

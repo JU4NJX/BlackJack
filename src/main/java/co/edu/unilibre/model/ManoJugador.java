@@ -1,11 +1,11 @@
 package co.edu.unilibre.model;
 
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 public class ManoJugador extends Mano {
 
     private Apuesta apuesta;
-    private Resultado resultado;
+    private Resultados resultado;
     private boolean plantada;
     private boolean doblada;
     private boolean dividida;
@@ -89,11 +89,11 @@ public class ManoJugador extends Mano {
         this.apuesta = apuesta;
     }
 
-    public Resultado obtenerResultado() {
+    public Resultados obtenerResultado() {
         return resultado;
     }
 
-    public void modificarResultado(Resultado resultado) {
+    public void modificarResultado(Resultados resultado) {
         this.resultado = resultado;
     }
 

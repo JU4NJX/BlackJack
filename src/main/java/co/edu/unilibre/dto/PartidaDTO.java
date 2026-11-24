@@ -1,7 +1,7 @@
 package co.edu.unilibre.dto;
 
 import co.edu.unilibre.model.enums.EstadoPartida;
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +12,13 @@ public class PartidaDTO {
     private int puntuacionJugador;
     private int puntuacionCrupier;
     private EstadoPartida estado;
-    private Resultado resultado;
+    private Resultados resultado;
     private List<CartaDTO> cartasJugador = new ArrayList<>();
     private List<CartaDTO> cartasCrupier = new ArrayList<>();
     private List<List<CartaDTO>> manosJugador = new ArrayList<>();
     private double saldoActual;
     private double apuestaTotal;
+    private double puntosResultado;
 
     public int obtenerId() {
         return id;
@@ -51,11 +52,11 @@ public class PartidaDTO {
         this.estado = estado;
     }
 
-    public Resultado obtenerResultado() {
+    public Resultados obtenerResultado() {
         return resultado;
     }
 
-    public void modificarResultado(Resultado resultado) {
+    public void modificarResultado(Resultados resultado) {
         this.resultado = resultado;
     }
 
@@ -98,4 +99,8 @@ public class PartidaDTO {
     public void modificarApuestaTotal(double apuestaTotal) {
         this.apuestaTotal = apuestaTotal;
     }
+
+    public double obtenerPuntosResultado() {return puntosResultado;}
+
+    public void modificarPuntosResultado(double puntosResultado) {this.puntosResultado = puntosResultado;}
 }

@@ -3,7 +3,7 @@ package co.edu.unilibre.dao;
 import co.edu.unilibre.datebase.ConexionDB;
 import co.edu.unilibre.dto.HistorialDTO;
 import co.edu.unilibre.model.HistorialPartida;
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -272,7 +272,7 @@ public class PartidaDAO {
 
                     if (resultadoPartida != null) {
                         partida.modificarResultado(
-                                Resultado.valueOf(resultadoPartida)
+                                Resultados.valueOf(resultadoPartida)
                         );
                     }
 

@@ -1,18 +1,67 @@
+
 package co.edu.unilibre;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/
-// Actualizacion realizada por Juan Sebastian
-public class Main {
-    static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        IO.println(String.format("Hello and welcome!"));
+import co.edu.unilibre.controller.JuegoController;
+import co.edu.unilibre.controller.ApuestaController;
+import co.edu.unilibre.controller.HistorialController;
+import co.edu.unilibre.controller.UsuarioController;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
-        }
+import co.edu.unilibre.factory.CartaFactoryEstandar;
+import co.edu.unilibre.factory.MazoFactory;
+
+import co.edu.unilibre.service.JuegoService;
+import co.edu.unilibre.service.ApuestaService;
+import co.edu.unilibre.service.UsuarioService;
+import co.edu.unilibre.service.HistorialService;
+
+import co.edu.unilibre.strategy.EstrategiaClasica;
+
+import co.edu.unilibre.view.VentanaPrincipal;
+
+import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        SwingUtilities.invokeLater(() -> {
+
+            try {
+
+                // 1. Crear fábricas
+                CartaFactoryEstandar cartaFactory = new CartaFactoryEstandar();
+
+                MazoFactory mazoFactory = new MazoFactory(cartaFactory);
+
+                // 2. Crear servicios
+                UsuarioService usuarioService = new UsuarioService();
+
+                ApuestaService apuestaService = new ApuestaService();
+
+                HistorialService historialService = new HistorialService();
+
+                JuegoService juegoService = new JuegoService(new EstrategiaClasica(), mazoFactory, apuestaService);
+
+                // 3. Crear controladores
+                JuegoController juegoController = new JuegoController(juegoService);
+
+                ApuestaController apuestaController = new ApuestaController(apuestaService, usuarioService);
+
+                HistorialController historialController = new HistorialController(historialService);
+
+                UsuarioController usuarioController = new UsuarioController(usuarioService);
+
+                // 4. Iniciar interfaz gráfica
+                VentanaPrincipal ventana = new VentanaPrincipal(juegoController, apuestaController, historialController, usuarioController, juegoService);
+
+                ventana.iniciarAplicacion();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error al iniciar Blackjack:\n" + e.getMessage(), "Error de aplicación", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        });
     }
 }
+

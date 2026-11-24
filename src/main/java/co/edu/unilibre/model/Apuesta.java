@@ -1,6 +1,6 @@
 package co.edu.unilibre.model;
 
-import co.edu.unilibre.model.enums.Resultado;
+import co.edu.unilibre.model.enums.Resultados;
 
 public class Apuesta {
 
@@ -35,7 +35,7 @@ public class Apuesta {
         return true;
     }
 
-    public double obtenerRetorno(Resultado resultado) {
+    public double obtenerRetorno(Resultados resultado) {
         if (resultado == null) {
             throw new IllegalArgumentException("El resultado no puede ser nulo.");
         }
