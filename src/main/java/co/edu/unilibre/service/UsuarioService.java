@@ -39,7 +39,6 @@ public class UsuarioService {
                 throw new IllegalStateException("No fue posible crear el usuario predeterminado.");
             }
         }
-
         return usuario;
     }
 
@@ -54,7 +53,6 @@ public class UsuarioService {
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no existe.");
         }
-
         return usuario.obtenerSaldo();
     }
 
@@ -63,11 +61,9 @@ public class UsuarioService {
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo.");
         }
-
         if (usuario.obtenerId() <= 0) {
             throw new IllegalArgumentException("El identificador del usuario no es válido.");
         }
-
         if (usuario.obtenerSaldo() < 0 || !Double.isFinite(usuario.obtenerSaldo())) {
             throw new IllegalArgumentException("El saldo no es válido.");
         }

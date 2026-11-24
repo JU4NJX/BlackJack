@@ -29,14 +29,10 @@ public class UsuarioDAO {
     public void guardar(Usuario usuario, Connection conexion) {
 
         if (usuario == null) {
-            throw new IllegalArgumentException(
-                    "El usuario no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El usuario no puede ser nulo.");
         }
 
-        String sql = "INSERT INTO usuarios "
-                + "(nombre_usuario, correo, saldo, fecha_registro) "
-                + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO usuarios " + "(nombre_usuario, correo, saldo, fecha_registro) " + "VALUES (?, ?, ?, ?)";
 
         Connection conexionTrabajo = conexion;
         boolean cerrarConexion = false;
@@ -48,19 +44,12 @@ public class UsuarioDAO {
                 cerrarConexion = true;
             }
 
-            try (PreparedStatement sentencia = conexionTrabajo.prepareStatement(
-                    sql,
-                    Statement.RETURN_GENERATED_KEYS
-            )) {
+            try (PreparedStatement sentencia = conexionTrabajo.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
                 sentencia.setString(1, usuario.obtenerNombreUsuario());
                 sentencia.setString(2, usuario.obtenerCorreo());
                 sentencia.setDouble(3, usuario.obtenerSaldo());
-                sentencia.setTimestamp(
-                        4,
-                        Timestamp.valueOf(usuario.obtenerFechaRegistro())
-                );
-
+                sentencia.setTimestamp(4, Timestamp.valueOf(usuario.obtenerFechaRegistro()));
                 sentencia.executeUpdate();
 
                 try (ResultSet resultado = sentencia.getGeneratedKeys()) {
@@ -73,10 +62,7 @@ public class UsuarioDAO {
 
         } catch (SQLException e) {
 
-            throw new RuntimeException(
-                    "Error al guardar el usuario.",
-                    e
-            );
+            throw new RuntimeException("Error al guardar el usuario.", e);
 
         } finally {
 
@@ -84,10 +70,7 @@ public class UsuarioDAO {
                 try {
                     conexionTrabajo.close();
                 } catch (SQLException e) {
-                    throw new RuntimeException(
-                            "Error al cerrar la conexión.",
-                            e
-                    );
+                    throw new RuntimeException("Error al cerrar la conexión.", e);
                 }
             }
         }
@@ -109,10 +92,7 @@ public class UsuarioDAO {
 
         } catch (SQLException e) {
 
-            throw new RuntimeException(
-                    "Error al buscar el usuario único.",
-                    e
-            );
+            throw new RuntimeException("Error al buscar el usuario único.", e);
         }
     }
 
@@ -134,12 +114,8 @@ public class UsuarioDAO {
 
         } catch (SQLException e) {
 
-            throw new RuntimeException(
-                    "Error al buscar usuario por correo.",
-                    e
-            );
+            throw new RuntimeException("Error al buscar usuario por correo.", e);
         }
-
         return null;
     }
 
@@ -162,10 +138,7 @@ public class UsuarioDAO {
 
         } catch (SQLException e) {
 
-            throw new RuntimeException(
-                    "Error al buscar usuario por ID.",
-                    e
-            );
+            throw new RuntimeException("Error al buscar usuario por ID.", e);
         }
 
         return null;
@@ -175,9 +148,7 @@ public class UsuarioDAO {
     public void actualizarSaldo(Usuario usuario, Connection conexion) {
 
         if (usuario == null) {
-            throw new IllegalArgumentException(
-                    "El usuario no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El usuario no puede ser nulo.");
         }
 
         String sql = "UPDATE usuarios SET saldo = ? WHERE id = ?";
@@ -192,8 +163,7 @@ public class UsuarioDAO {
                 cerrarConexion = true;
             }
 
-            try (PreparedStatement sentencia =
-                         conexionTrabajo.prepareStatement(sql)) {
+            try (PreparedStatement sentencia = conexionTrabajo.prepareStatement(sql)) {
 
                 sentencia.setDouble(1, usuario.obtenerSaldo());
                 sentencia.setInt(2, usuario.obtenerId());
@@ -201,18 +171,13 @@ public class UsuarioDAO {
                 int filasActualizadas = sentencia.executeUpdate();
 
                 if (filasActualizadas == 0) {
-                    throw new IllegalArgumentException(
-                            "No existe el usuario que se desea actualizar."
-                    );
+                    throw new IllegalArgumentException("No existe el usuario que se desea actualizar.");
                 }
             }
 
         } catch (SQLException e) {
 
-            throw new RuntimeException(
-                    "Error al actualizar el saldo.",
-                    e
-            );
+            throw new RuntimeException("Error al actualizar el saldo.", e);
 
         } finally {
 
@@ -220,10 +185,7 @@ public class UsuarioDAO {
                 try {
                     conexionTrabajo.close();
                 } catch (SQLException e) {
-                    throw new RuntimeException(
-                            "Error al cerrar la conexión.",
-                            e
-                    );
+                    throw new RuntimeException("Error al cerrar la conexión.", e);
                 }
             }
         }

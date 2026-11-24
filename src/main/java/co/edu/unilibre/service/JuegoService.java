@@ -80,17 +80,9 @@ public class JuegoService implements Sujeto {
         }
 
         Apuesta nuevaApuesta = new Apuesta(apuesta);
-
-        Partida nuevaPartida = new Partida(
-                0,
-                mazoFactory.crearMazo(),
-                new EstadoInicial()
-        );
-
+        Partida nuevaPartida = new Partida(0, mazoFactory.crearMazo(), new EstadoInicial());
         ManoJugador manoJugador = new ManoJugador(nuevaApuesta);
-
         nuevaPartida.agregarManoJugador(manoJugador);
-
         nuevaPartida.iniciar();
 
         double saldoAnterior = usuario.obtenerSaldo();
@@ -112,12 +104,8 @@ public class JuegoService implements Sujeto {
 
         validarPartidaActiva();
         validarTurnoJugador();
-
         partidaActual.pedirCarta(indiceMano);
-
-        notificarObservadores();
-
-        return construirPartidaDTO();
+        return actualizarDespuesAccion();
     }
 
     // Plantarse
@@ -126,12 +114,8 @@ public class JuegoService implements Sujeto {
 
         validarPartidaActiva();
         validarTurnoJugador();
-
         partidaActual.plantarse(indiceMano);
-
-        notificarObservadores();
-
-        return construirPartidaDTO();
+        return actualizarDespuesAccion();
     }
 
     // Doblar apuesta
@@ -140,11 +124,8 @@ public class JuegoService implements Sujeto {
 
         validarPartidaActiva();
         validarTurnoJugador();
-
         List<ManoJugador> manos = partidaActual.obtenerManosJugador();
-
         validarIndiceMano(indiceMano, manos);
-
         ManoJugador mano = manos.get(indiceMano);
 
         if (!mano.puedeDoblar()) {
@@ -166,9 +147,7 @@ public class JuegoService implements Sujeto {
             throw new IllegalStateException("No se pudo completar la doble apuesta.");
         }
 
-        notificarObservadores();
-
-        return construirPartidaDTO();
+        return actualizarDespuesAccion();
     }
 
     // Dividir mano
@@ -177,7 +156,6 @@ public class JuegoService implements Sujeto {
 
         validarPartidaActiva();
         validarTurnoJugador();
-
         List<ManoJugador> manos = partidaActual.obtenerManosJugador();
 
         if (manos.isEmpty()) {
@@ -206,10 +184,7 @@ public class JuegoService implements Sujeto {
         if (!partidaActual.dividirMano()) {
             throw new IllegalStateException("No se pudo dividir la mano.");
         }
-
-        notificarObservadores();
-
-        return construirPartidaDTO();
+        return actualizarDespuesAccion();
     }
 
     // Ejecutar turno del crupier
@@ -236,11 +211,7 @@ public class JuegoService implements Sujeto {
         Mano manoCrupier = partidaActual.obtenerManoCrupier();
 
         while (estrategiaCrupier.debePedirCarta(manoCrupier)) {
-
-            if (partidaActual.obtenerMazo().estaVacio()) {
-                break;
-            }
-
+            if (partidaActual.obtenerMazo().estaVacio()) {break;}
             partidaActual.pedirCartaCrupier();
         }
 
@@ -260,29 +231,22 @@ public class JuegoService implements Sujeto {
     public PartidaDTO finalizarPartida() {
 
         validarPartidaActiva();
-
         List<ManoJugador> manos = partidaActual.obtenerManosJugador();
-
         Mano manoCrupier = partidaActual.obtenerManoCrupier();
 
         // Determinar el resultado de cada mano.
         for (ManoJugador mano : manos) {
-
             Resultados resultado = determinarResultadoMano(mano, manoCrupier);
-
             mano.modificarResultado(resultado);
         }
 
         // Marcar la partida como finalizada.
         partidaActual.finalizar();
-
         partidaActual.modificarEstadoActual(new EstadoFinalizado());
-
         // Liquidar apuestas y actualizar la información en la base de datos.
         apuestaService.liquidarPartida(partidaActual, usuarioActual);
 
         notificarObservadores();
-
         return construirPartidaDTO();
     }
 
@@ -292,14 +256,9 @@ public class JuegoService implements Sujeto {
 
         // Una mano dividida no puede obtener premio de blackjack.
         if (mano.obtenerDividida()) {
-
-            if (puntuacionService.tieneBlackjack(manoCrupier)) {
-                return Resultados.PERDIDA;
-            }
-
+            if (puntuacionService.tieneBlackjack(manoCrupier)) {return Resultados.PERDIDA;}
             return puntuacionService.compararPuntuaciones(mano, manoCrupier);
         }
-
         return puntuacionService.determinarResultado(mano, manoCrupier);
     }
 
@@ -329,21 +288,16 @@ public class JuegoService implements Sujeto {
     @Override
     public void notificarObservadores() {
 
-        if (partidaActual == null || usuarioActual == null) {
-            return;
-        }
+        if (partidaActual == null || usuarioActual == null) {return;}
 
         PartidaDTO dto = construirPartidaDTO();
 
-        for (Observador observador : new ArrayList<>(observadores)) {
-            observador.actualizar(dto);
-        }
+        for (Observador observador : new ArrayList<>(observadores)) {observador.actualizar(dto);}
     }
 
     // Validar partida activa
 
     private void validarPartidaActiva() {
-
         if (partidaActual == null || partidaActual.estaFinalizada()) {
             throw new IllegalStateException("No existe una partida activa.");
         }
@@ -352,11 +306,9 @@ public class JuegoService implements Sujeto {
     // Validar turno del jugador
 
     private void validarTurnoJugador() {
-
         if (partidaActual.obtenerEstadoActual() instanceof EstadoTurnoCrupier) {
             throw new IllegalStateException("No es el turno del jugador.");
         }
-
         if (partidaActual.obtenerEstadoActual() instanceof EstadoFinalizado) {
             throw new IllegalStateException("La partida ya ha finalizado.");
         }
@@ -373,67 +325,55 @@ public class JuegoService implements Sujeto {
     private PartidaDTO construirPartidaDTO() {
 
         PartidaDTO dto = new PartidaDTO();
-
         dto.modificarId(partidaActual.obtenerId());
-
         List<ManoJugador> manos = partidaActual.obtenerManosJugador();
-
         List<List<CartaDTO>> manosDTO = new ArrayList<>();
-
         List<CartaDTO> cartasJugador = new ArrayList<>();
+        List<Boolean> manosFinalizadas = new ArrayList<>();
 
         int puntuacionJugador = 0;
         double apuestaTotal = 0;
 
         for (ManoJugador mano : manos) {
-
             List<CartaDTO> cartasMano = new ArrayList<>();
-
             for (Carta carta : mano.obtenerCartas()) {
                 cartasMano.add(convertirCartaDTO(carta, true));
             }
-
             manosDTO.add(cartasMano);
             cartasJugador.addAll(cartasMano);
 
+            // Informar si esta mano ya terminó.
+            manosFinalizadas.add(mano.estaFinalizada());
             puntuacionJugador += mano.calcularPuntuacion();
-
             apuestaTotal += mano.obtenerApuesta().obtenerMontoTotal();
         }
 
         List<CartaDTO> cartasCrupier = new ArrayList<>();
-
         Mano manoCrupier = partidaActual.obtenerManoCrupier();
 
         for (int i = 0; i < manoCrupier.obtenerCartas().size(); i++) {
-
             Carta carta = manoCrupier.obtenerCartas().get(i);
-
             boolean visible = i != 1 || partidaActual.estaFinalizada();
-
             cartasCrupier.add(convertirCartaDTO(carta, visible));
         }
 
         dto.modificarCartasJugador(cartasJugador);
         dto.modificarCartasCrupier(cartasCrupier);
         dto.modificarManosJugador(manosDTO);
-
+        // Enviar el estado de cada mano.
+        dto.modificarManosFinalizadas(manosFinalizadas);
+        // Informar si la mano inicial permite dividir.
+        dto.modificarPuedeDividir(manos.size() == 1 && manos.get(0).puedeDividir());
         dto.modificarPuntuacionJugador(puntuacionJugador);
-
-        dto.modificarPuntuacionCrupier(
-                partidaActual.estaFinalizada() ? puntuacionService.calcularPuntuacion(manoCrupier) : 0);
-
+        dto.modificarPuntuacionCrupier(partidaActual.estaFinalizada() ? puntuacionService.calcularPuntuacion(manoCrupier) : 0);
         dto.modificarSaldoActual(usuarioActual.obtenerSaldo());
         dto.modificarApuestaTotal(apuestaTotal);
 
         if (partidaActual.estaFinalizada()) {
             dto.modificarResultado(determinarResultadoGlobal(manos));
-
             dto.modificarPuntosResultado(calcularPuntosResultado());
         }
-
         dto.modificarEstado(partidaActual.estaFinalizada() ? EstadoPartida.FINALIZADA : EstadoPartida.TURNO_JUGADOR);
-
         return dto;
     }
 
@@ -442,17 +382,13 @@ public class JuegoService implements Sujeto {
     private CartaDTO convertirCartaDTO(Carta carta, boolean visible) {
 
         CartaDTO dto = new CartaDTO();
-
         dto.modificarPalo(carta.obtenerPalo().name());
-
         dto.modificarValor(carta.obtenerValorCarta().name());
-
         dto.modificarVisible(visible);
 
         if (visible) {
             dto.modificarImagen(carta.obtenerPalo().name().toLowerCase() + "_" + carta.obtenerValorCarta().name().toLowerCase() + ".png");
         }
-
         return dto;
     }
 
@@ -472,13 +408,8 @@ public class JuegoService implements Sujeto {
 
         int comparacion = Double.compare(retornoTotal, apuestaTotal);
 
-        if (comparacion > 0) {
-            return Resultados.GANADA;
-        }
-
-        if (comparacion < 0) {
-            return Resultados.PERDIDA;
-        }
+        if (comparacion > 0) {return Resultados.GANADA;}
+        if (comparacion < 0) {return Resultados.PERDIDA;}
 
         return Resultados.EMPATE;
     }
@@ -486,5 +417,26 @@ public class JuegoService implements Sujeto {
     // Calcular los puntos netos de la partida
     private double calcularPuntosResultado() {
         return usuarioActual.obtenerSaldo() - saldoInicialPartida;
+    }
+
+    private boolean todasLasManosFinalizadas() {
+        List<ManoJugador> manos = partidaActual.obtenerManosJugador();
+        if (manos.isEmpty()) {
+            return false;
+        }
+        for (ManoJugador mano : manos) {
+            if (!mano.estaFinalizada()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private PartidaDTO actualizarDespuesAccion() {
+        if (todasLasManosFinalizadas()) {
+            return ejecutarTurnoCrupier();
+        }
+        notificarObservadores();
+        return construirPartidaDTO();
     }
 }

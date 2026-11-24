@@ -3,7 +3,6 @@ package co.edu.unilibre.state;
 import co.edu.unilibre.model.Partida;
 
 public class EstadoFinalizado implements Estado {
-
     @Override
     public void iniciar(Partida partida) {
         throw new IllegalStateException("La partida ya ha finalizado.");

@@ -10,9 +10,7 @@ public class UsuarioController {
 
     public UsuarioController(UsuarioService usuarioService) {
         if (usuarioService == null) {
-            throw new IllegalArgumentException(
-                    "El servicio de usuario no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El servicio de usuario no puede ser nulo.");
         }
         this.usuarioService = usuarioService;
     }
@@ -20,11 +18,9 @@ public class UsuarioController {
     public UsuarioDTO obtenerUsuario() {
         return usuarioService.obtenerUsuario();
     }
-
     public double consultarSaldo(int idUsuario) {
         return usuarioService.consultarSaldo(idUsuario);
     }
-
     public void actualizarSaldo(Usuario usuario) {
         usuarioService.actualizarSaldo(usuario);
     }

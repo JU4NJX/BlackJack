@@ -25,7 +25,6 @@ public class DialogoResultado extends JDialog {
     }
 
     private void configurarDialogo() {
-
         setSize(400, 250);
         setLocationRelativeTo(getOwner());
         setResizable(false);
@@ -35,42 +34,22 @@ public class DialogoResultado extends JDialog {
     private void inicializarComponentes() {
 
         JPanel panelCentral = new JPanel();
-        panelCentral.setLayout(
-                new BoxLayout(panelCentral, BoxLayout.Y_AXIS)
-        );
-
+        panelCentral.setLayout(new BoxLayout(panelCentral, BoxLayout.Y_AXIS));
         panelCentral.setBackground(new Color(20, 90, 60));
-        panelCentral.setBorder(
-                BorderFactory.createEmptyBorder(25, 20, 25, 20)
-        );
+        panelCentral.setBorder(BorderFactory.createEmptyBorder(25, 20, 25, 20));
 
-        etiquetaResultado = new JLabel(
-                "Resultado de la partida",
-                SwingConstants.CENTER
-        );
-
-        etiquetaResultado.setFont(
-                new Font("Arial", Font.BOLD, 25)
-        );
+        etiquetaResultado = new JLabel("Resultado de la partida", SwingConstants.CENTER);
+        etiquetaResultado.setFont(new Font("Arial", Font.BOLD, 25));
         etiquetaResultado.setForeground(Color.WHITE);
         etiquetaResultado.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        etiquetaPuntos = new JLabel(
-                "Puntos: 0",
-                SwingConstants.CENTER
-        );
-
-        etiquetaPuntos.setFont(
-                new Font("Arial", Font.BOLD, 20)
-        );
+        etiquetaPuntos = new JLabel("Puntos: 0", SwingConstants.CENTER);
+        etiquetaPuntos.setFont(new Font("Arial", Font.BOLD, 20));
         etiquetaPuntos.setForeground(Color.WHITE);
         etiquetaPuntos.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton botonAceptar = new JButton("Aceptar");
 
-        botonAceptar.setFont(
-                new Font("Arial", Font.BOLD, 15)
-        );
+        botonAceptar.setFont(new Font("Arial", Font.BOLD, 15));
         botonAceptar.setAlignmentX(Component.CENTER_ALIGNMENT);
         botonAceptar.addActionListener(e -> dispose());
 
@@ -86,11 +65,8 @@ public class DialogoResultado extends JDialog {
     public void mostrarResultado(Resultados resultado) {
 
         if (resultado == null) {
-            throw new IllegalArgumentException(
-                    "El resultado no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El resultado no puede ser nulo.");
         }
-
         this.resultado = resultado;
 
         String mensaje;
@@ -135,13 +111,9 @@ public class DialogoResultado extends JDialog {
     }
 
     public void modificarResultado(Resultados resultado) {
-
         if (resultado == null) {
-            throw new IllegalArgumentException(
-                    "El resultado no puede ser nulo."
-            );
+            throw new IllegalArgumentException("El resultado no puede ser nulo.");
         }
-
         this.resultado = resultado;
     }
 
@@ -150,7 +122,6 @@ public class DialogoResultado extends JDialog {
     }
 
     public void modificarPuntos(double puntos) {
-
         this.puntos = puntos;
         etiquetaPuntos.setText("Puntos: " + puntos);
     }

@@ -19,6 +19,8 @@ public class PartidaDTO {
     private double saldoActual;
     private double apuestaTotal;
     private double puntosResultado;
+    private List<Boolean> manosFinalizadas = new ArrayList<>();
+    private boolean puedeDividir;
 
     public int obtenerId() {
         return id;
@@ -103,4 +105,19 @@ public class PartidaDTO {
     public double obtenerPuntosResultado() {return puntosResultado;}
 
     public void modificarPuntosResultado(double puntosResultado) {this.puntosResultado = puntosResultado;}
+
+    public List<Boolean> obtenerManosFinalizadas() {
+        return manosFinalizadas;
+    }
+
+    public void modificarManosFinalizadas(List<Boolean> manosFinalizadas) {
+        if (manosFinalizadas == null) {
+            throw new IllegalArgumentException("La lista de estados de las manos no puede ser nula.");
+        }
+        this.manosFinalizadas = new ArrayList<>(manosFinalizadas);
+    }
+
+    public boolean obtenerPuedeDividir() {return puedeDividir;}
+
+    public void modificarPuedeDividir(boolean puedeDividir) {this.puedeDividir = puedeDividir;}
 }

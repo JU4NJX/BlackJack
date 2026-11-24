@@ -13,9 +13,7 @@ public class PanelReglas extends JPanel {
     public PanelReglas(VentanaPrincipal ventana) {
 
         if (ventana == null) {
-            throw new IllegalArgumentException(
-                    "La ventana principal no puede ser nula."
-            );
+            throw new IllegalArgumentException("La ventana principal no puede ser nula.");
         }
 
         this.ventana = ventana;
@@ -33,10 +31,7 @@ public class PanelReglas extends JPanel {
 
     private void inicializarComponentes() {
 
-        JLabel titulo = new JLabel(
-                "REGLAS DE BLACKJACK ♠",
-                SwingConstants.CENTER
-        );
+        JLabel titulo = new JLabel("REGLAS DE BLACKJACK ♠", SwingConstants.CENTER);
 
         titulo.setFont(new Font("Arial", Font.BOLD, 27));
         titulo.setForeground(Color.WHITE);

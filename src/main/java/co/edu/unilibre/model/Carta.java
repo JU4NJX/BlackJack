@@ -13,7 +13,6 @@ public class Carta {
         if (palo == null || valor == null) {
             throw new IllegalArgumentException("El palo y el valor son obligatorios.");
         }
-
         this.palo = palo;
         this.valor = valor;
         this.valorNumerico = calcularValorNumerico(valor);

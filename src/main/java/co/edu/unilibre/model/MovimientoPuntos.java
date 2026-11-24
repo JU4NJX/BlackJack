@@ -11,9 +11,7 @@ public class MovimientoPuntos {
     private double cantidad;
     private LocalDateTime fecha;
 
-    public MovimientoPuntos(int id, int idUsuario,
-                            TipoMovimiento tipo, double cantidad,
-                            LocalDateTime fecha) {
+    public MovimientoPuntos(int id, int idUsuario, TipoMovimiento tipo, double cantidad, LocalDateTime fecha) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.tipo = tipo;
@@ -53,9 +51,7 @@ public class MovimientoPuntos {
 
     public void modificarCantidad(double cantidad) {
         if (cantidad < 0) {
-            throw new IllegalArgumentException(
-                    "La cantidad no puede ser negativa."
-            );
+            throw new IllegalArgumentException("La cantidad no puede ser negativa.");
         }
         this.cantidad = cantidad;
     }

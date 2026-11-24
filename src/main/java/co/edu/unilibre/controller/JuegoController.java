@@ -15,31 +15,22 @@ public class JuegoController {
     }
 
     // Iniciar partida
-
     public void iniciarPartida(double apuesta) {
         juegoService.iniciarPartida(apuesta);
     }
-
     // Pedir carta
-
     public void pedirCarta(int indiceMano) {
         juegoService.pedirCarta(indiceMano);
     }
-
     // Plantarse
-
     public void plantarse(int indiceMano) {
         juegoService.plantarse(indiceMano);
     }
-
     // Doblar apuesta
-
     public void doblarApuesta(int indiceMano) {
         juegoService.doblarApuesta(indiceMano);
     }
-
     // Dividir mano
-
     public void dividirMano() {
         juegoService.dividirMano();
     }

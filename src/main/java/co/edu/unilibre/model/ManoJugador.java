@@ -49,19 +49,25 @@ public class ManoJugador extends Mano {
     }
 
     public boolean puedeDoblar() {
-        return !plantada && !doblada && !dividida && cartas.size() == 2 && !superaVeintiuno() && apuesta != null && !apuesta.estaLiquidada();
+        return !estaFinalizada() && !doblada && !dividida && cartas.size() == 2 && apuesta != null && !apuesta.estaLiquidada();
     }
 
     public boolean puedeDividir() {
+
         if (plantada || doblada || dividida || cartas.size() != 2) {
             return false;
         }
 
-        if (cartas.get(0).esAs() && cartas.get(1).esAs()) {
+        Carta primera = cartas.get(0);
+        Carta segunda = cartas.get(1);
+
+        // Mantener la regla especial para los ases.
+        if (primera.esAs() && segunda.esAs()) {
             return !asDividido;
         }
 
-        return cartas.get(0).obtenerValor() == cartas.get(1).obtenerValor();
+        // Comparar el valor de las cartas, sin importar el palo.
+        return primera.obtenerValorCarta() == segunda.obtenerValorCarta();
     }
 
     public void finalizarMano() {

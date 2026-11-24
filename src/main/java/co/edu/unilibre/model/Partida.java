@@ -52,6 +52,35 @@ public class Partida {
         estadoActual.iniciar(this);
     }
 
+    public void repartirCartasIniciales() {
+
+        validarPartidaActiva();
+
+        if (manosJugador.isEmpty()) {
+            throw new IllegalStateException("No existe una mano inicial del jugador.");
+        }
+
+        if (!manosJugador.get(0).obtenerCartas().isEmpty()
+                || !manoCrupier.obtenerCartas().isEmpty()) {
+
+            throw new IllegalStateException("Las cartas iniciales ya fueron repartidas.");
+        }
+
+        if (mazo.cantidadCartas() < 4) {
+            throw new IllegalStateException("No hay suficientes cartas para iniciar la partida.");
+        }
+
+        ManoJugador manoJugador = manosJugador.get(0);
+
+        // Primera ronda
+        manoJugador.agregarCarta(mazo.repartirCarta());
+        manoCrupier.agregarCarta(mazo.repartirCarta());
+
+        // Segunda ronda
+        manoJugador.agregarCarta(mazo.repartirCarta());
+        manoCrupier.agregarCarta(mazo.repartirCarta());
+    }
+
     public void agregarManoJugador(ManoJugador mano) {
 
         validarPartidaActiva();
@@ -218,37 +247,26 @@ public class Partida {
     }
 
     public void pedirCartaCrupier() {
-
         validarPartidaActiva();
-
         if (mazo.estaVacio()) {
-            throw new IllegalStateException(
-                    "No quedan cartas en el mazo."
-            );
+            throw new IllegalStateException("No quedan cartas en el mazo.");
         }
-
         Carta carta = mazo.repartirCarta();
-
         manoCrupier.agregarCarta(carta);
     }
 
     public void ejecutarTurnoCrupier() {
-
         validarPartidaActiva();
-
         estadoActual.ejecutarTurno(this);
     }
 
 
     public void ejecutarTurnoCrupierDesdeEstado() {
-
         validarPartidaActiva();
     }
 
     public void finalizar() {
-
         if (!finalizada) {
-
             finalizada = true;
             fechaFin = LocalDateTime.now();
         }
@@ -259,17 +277,13 @@ public class Partida {
     }
 
     private void validarPartidaActiva() {
-
         if (finalizada) {
             throw new IllegalStateException("La partida ya está finalizada.");
         }
     }
 
     private void validarIndiceMano(int indiceMano) {
-
-        if (indiceMano < 0
-                || indiceMano >= manosJugador.size()) {
-
+        if (indiceMano < 0 || indiceMano >= manosJugador.size()) {
             throw new IndexOutOfBoundsException("El índice de la mano no es válido.");
         }
     }

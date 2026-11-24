@@ -12,7 +12,8 @@ public class ApuestaController {
 
     public ApuestaController(ApuestaService apuestaService, UsuarioService usuarioService) {
         if (apuestaService == null || usuarioService == null) {
-            throw new IllegalArgumentException("Los servicios no pueden ser nulos.");}
+            throw new IllegalArgumentException("Los servicios no pueden ser nulos.");
+        }
         this.apuestaService = apuestaService;
         this.usuarioService = usuarioService;
     }

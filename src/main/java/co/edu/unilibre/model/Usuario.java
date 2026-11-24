@@ -31,11 +31,9 @@ public class Usuario {
         if (cantidad <= 0) {
             return false;
         }
-
         if (!tieneSaldo(cantidad)) {
             return false;
         }
-
         saldo -= cantidad;
         return true;
     }

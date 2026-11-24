@@ -1,4 +1,3 @@
-
 package co.edu.unilibre.state;
 
 import co.edu.unilibre.model.Partida;
@@ -27,5 +26,3 @@ public class EstadoTurnoJugador implements Estado {
         );
     }
 }
-
-

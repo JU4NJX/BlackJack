@@ -4,6 +4,8 @@ import co.edu.unilibre.dto.CartaDTO;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PanelCrupier extends JPanel {
@@ -17,7 +19,7 @@ public class PanelCrupier extends JPanel {
 
     public PanelCrupier() {
 
-        this.cartas = new java.util.ArrayList<>();
+        this.cartas = new ArrayList<>();
         this.puntuacion = 0;
 
         configurarPanel();
@@ -59,20 +61,33 @@ public class PanelCrupier extends JPanel {
             throw new IllegalArgumentException("La lista de cartas no puede ser nula.");
         }
 
-        this.cartas = new java.util.ArrayList<>(cartas);
+        this.cartas = new ArrayList<>(cartas);
 
         panelCartas.removeAll();
 
         for (CartaDTO carta : this.cartas) {
 
-            JLabel etiquetaCarta = new JLabel(obtenerTextoCarta(carta), SwingConstants.CENTER);
+            JLabel etiquetaCarta = new JLabel();
+            etiquetaCarta.setPreferredSize(new Dimension(90, 130));
+            etiquetaCarta.setHorizontalAlignment(SwingConstants.CENTER);
 
-            etiquetaCarta.setPreferredSize(new Dimension(75, 105));
-            etiquetaCarta.setOpaque(true);
-            etiquetaCarta.setBackground(Color.WHITE);
-            etiquetaCarta.setForeground(Color.BLACK);
-            etiquetaCarta.setFont(new Font("Arial", Font.BOLD, 15));
-            etiquetaCarta.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            if (carta == null) {
+                etiquetaCarta.setText("Carta");
+            } else {
+
+                ImageIcon imagen = cargarImagenCarta(carta);
+
+                if (imagen != null) {
+                    etiquetaCarta.setIcon(imagen);
+                } else {
+                    etiquetaCarta.setText(obtenerTextoCarta(carta));
+                    etiquetaCarta.setOpaque(true);
+                    etiquetaCarta.setBackground(Color.WHITE);
+                    etiquetaCarta.setForeground(Color.BLACK);
+                    etiquetaCarta.setFont(new Font("Arial", Font.BOLD, 13));
+                    etiquetaCarta.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+                }
+            }
 
             panelCartas.add(etiquetaCarta);
         }
@@ -81,30 +96,42 @@ public class PanelCrupier extends JPanel {
         panelCartas.repaint();
     }
 
+    private ImageIcon cargarImagenCarta(CartaDTO carta) {
+        if (carta == null) {return null;}
+        if (!carta.obtenerVisible()) {return cargarImagen("/img/reverso.png");}
+        String nombreImagen = carta.obtenerImagen();
+        if (nombreImagen == null || nombreImagen.trim().isEmpty()) {return null;}
+        return cargarImagen("/img/" + nombreImagen);
+    }
+
+    private ImageIcon cargarImagen(String ruta) {
+
+        URL recurso = getClass().getResource(ruta);
+
+        if (recurso == null) {
+            System.err.println("No se encontró la imagen: " + ruta);
+            return null;
+        }
+
+        ImageIcon imagenOriginal = new ImageIcon(recurso);
+        Image imagenEscalada = imagenOriginal.getImage().getScaledInstance(90, 130, Image.SCALE_SMOOTH);
+
+        return new ImageIcon(imagenEscalada);
+    }
+
     private String obtenerTextoCarta(CartaDTO carta) {
-
-        if (carta == null) {
-            return "Carta";
-        }
-
-        if (!carta.obtenerVisible()) {
-            return "OCULTA";
-        }
-
-        String valor = String.valueOf(carta.obtenerValor());
-        String palo = String.valueOf(carta.obtenerPalo());
-
-        return "<html><center>" + valor + "<br>" + palo + "</center></html>";
+        if (carta == null) {return "Carta";}
+        if (!carta.obtenerVisible()) {return "OCULTA";}
+        return "<html><center>" + carta.obtenerValor() + "<br>" + carta.obtenerPalo() + "</center></html>";
     }
 
     public void actualizarPuntuacion(int puntuacion) {
-
         this.puntuacion = puntuacion;
         etiquetaPuntuacion.setText("Puntuación: " + puntuacion);
     }
 
     public List<CartaDTO> obtenerCartas() {
-        return new java.util.ArrayList<>(cartas);
+        return new ArrayList<>(cartas);
     }
 
     public void modificarCartas(List<CartaDTO> cartas) {
@@ -124,4 +151,3 @@ public class PanelCrupier extends JPanel {
         actualizarPuntuacion(puntuacion);
     }
 }
-

@@ -24,12 +24,8 @@ public class PanelHistorial extends JPanel {
 
     public PanelHistorial(HistorialController historialController, UsuarioController usuarioController, VentanaPrincipal ventana) {
 
-        if (historialController == null ||
-                usuarioController == null ||
-                ventana == null) {
-            throw new IllegalArgumentException(
-                    "Las dependencias no pueden ser nulas."
-            );
+        if (historialController == null || usuarioController == null || ventana == null) {
+            throw new IllegalArgumentException("Las dependencias no pueden ser nulas.");
         }
 
         this.historialController = historialController;
@@ -49,10 +45,7 @@ public class PanelHistorial extends JPanel {
 
     private void inicializarComponentes() {
 
-        JLabel titulo = new JLabel(
-                "HISTORIAL DE PARTIDAS",
-                SwingConstants.CENTER
-        );
+        JLabel titulo = new JLabel("HISTORIAL DE PARTIDAS", SwingConstants.CENTER);
 
         titulo.setFont(new Font("Arial", Font.BOLD, 25));
         titulo.setForeground(Color.WHITE);
@@ -78,9 +71,7 @@ public class PanelHistorial extends JPanel {
         tablaHistorial = new JTable(modeloTabla);
         tablaHistorial.setRowHeight(28);
         tablaHistorial.setFont(new Font("Arial", Font.PLAIN, 13));
-        tablaHistorial.getTableHeader().setFont(
-                new Font("Arial", Font.BOLD, 13)
-        );
+        tablaHistorial.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
 
         JScrollPane desplazamiento = new JScrollPane(tablaHistorial);
 
@@ -106,9 +97,7 @@ public class PanelHistorial extends JPanel {
     public void mostrarHistorial(List<HistorialDTO> registros) {
 
         if (registros == null) {
-            throw new IllegalArgumentException(
-                    "La lista del historial no puede ser nula."
-            );
+            throw new IllegalArgumentException("La lista del historial no puede ser nula.");
         }
 
         this.registros = new ArrayList<>(registros);
@@ -116,7 +105,6 @@ public class PanelHistorial extends JPanel {
         modeloTabla.setRowCount(0);
 
         for (HistorialDTO registro : this.registros) {
-
             if (registro == null) {
                 continue;
             }
@@ -142,28 +130,16 @@ public class PanelHistorial extends JPanel {
             UsuarioDTO usuario = usuarioController.obtenerUsuario();
 
             if (usuario == null) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se encontró un usuario.",
-                        "Historial",
-                        JOptionPane.WARNING_MESSAGE
-                );
+                JOptionPane.showMessageDialog(this, "No se encontró un usuario.", "Historial", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            List<HistorialDTO> historial =
-                    historialController.cargarHistorial(usuario.obtenerId());
+            List<HistorialDTO> historial = historialController.cargarHistorial(usuario.obtenerId());
 
             mostrarHistorial(historial);
 
         } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No fue posible cargar el historial: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "No fue posible cargar el historial: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

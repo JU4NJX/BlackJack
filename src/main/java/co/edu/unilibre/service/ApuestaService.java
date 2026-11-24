@@ -29,8 +29,9 @@ public class ApuestaService {
     private MovimientoPuntosDAO movimientoDAO;
     private ConexionDB conexionBD;
 
-    public ApuestaService (UsuarioDAO usuarioDAO, PartidaDAO partidaDAO, MovimientoPuntosDAO movimientoDAO, ConexionDB conexionBD) {
+    private static final double APUESTA_MINIMA = 100.0;
 
+    public ApuestaService(UsuarioDAO usuarioDAO, PartidaDAO partidaDAO, MovimientoPuntosDAO movimientoDAO, ConexionDB conexionBD) {
         if (usuarioDAO == null || partidaDAO == null || movimientoDAO == null || conexionBD == null) {
             throw new IllegalArgumentException("Las dependencias de ApuestaService no pueden ser nulas.");
         }
@@ -47,31 +48,21 @@ public class ApuestaService {
         this.conexionBD = new ConexionDB();
     }
 
-    // Validar apuesta
+    // Validar apuesta inicial
 
     public boolean validarApuesta(double saldo, double monto) {
+        return Double.isFinite(saldo) && saldo >= 0 && Validador.validarMonto(monto) && monto >= APUESTA_MINIMA && saldo >= monto;
+    }
 
-        if (!Double.isFinite(saldo) || saldo < 0 || !Validador.validarMonto(monto)) {
-            return false;
-        }
+    // Validar dinero adicional para doble apuesta o división
 
-        boolean apuestaPermitida = false;
-
-        for (double apuesta : Constantes.APUESTAS_PERMITIDAS) {
-
-            if (Double.compare(apuesta, monto) == 0) {
-                apuestaPermitida = true;
-                break;
-            }
-        }
-
-        return apuestaPermitida && saldo >= monto;
+    private boolean validarMontoAdicional(double saldo, double monto) {
+        return Double.isFinite(saldo) && saldo >= 0 && Validador.validarMonto(monto) && saldo >= monto;
     }
 
     // Registrar apuesta (firma original del UML)
 
     public void registrarApuesta(Apuesta apuesta) {
-
         throw new IllegalStateException("Para registrar una apuesta se necesita identificar " + "al usuario. Utilice registrarApuesta(Apuesta, Usuario).");
     }
 
@@ -141,7 +132,6 @@ public class ApuestaService {
             HistorialPartida historial = new HistorialPartida(0, partida.obtenerFechaInicio(), monto, usuario.obtenerSaldo());
 
             int idGenerado = partidaDAO.guardar(historial, usuario.obtenerId(), conexion);
-
             if (idGenerado <= 0) {
                 throw new SQLException("No se pudo generar el identificador de la partida.");
             }
@@ -153,43 +143,36 @@ public class ApuestaService {
         } catch (SQLException | RuntimeException e) {
 
             restaurarSaldo(usuario, saldoAnterior);
-
             revertirTransaccion(conexion);
 
             throw new IllegalStateException("No se pudo registrar la apuesta y la partida.", e);
 
-        } finally {cerrarConexion(conexion);}
+        } finally {
+            cerrarConexion(conexion);
+        }
     }
 
     // Procesar doble apuesta (firma original del UML)
 
     public boolean procesarDobleApuesta(Apuesta apuesta) {
-
         throw new IllegalStateException("Para procesar una doble apuesta se necesita identificar " + "al usuario. Utilice procesarDobleApuesta(Apuesta, Usuario).");
     }
 
     // Procesar doble apuesta con usuario
 
     public boolean procesarDobleApuesta(Apuesta apuesta, Usuario usuario) {
-
-        if (!validarApuestaPendiente(apuesta, usuario)) {
-            return false;
-        }
+        if (!validarApuestaPendiente(apuesta, usuario)) {return false;}
 
         double montoAdicional = apuesta.obtenerMontoInicial();
 
-        if (!validarApuesta(usuario.obtenerSaldo(), montoAdicional)) {
-            return false;
-        }
+        if (!validarMontoAdicional(usuario.obtenerSaldo(), montoAdicional)) {return false;}
 
-        return descontarYRegistrarMovimiento(usuario, montoAdicional, TipoMovimiento.APUESTA
-        );
+        return descontarYRegistrarMovimiento(usuario, montoAdicional, TipoMovimiento.APUESTA);
     }
 
     // Procesar división (firma original del UML)
 
     public boolean procesarSplit(Apuesta apuesta) {
-
         throw new IllegalStateException("Para procesar una división se necesita identificar " + "al usuario. Utilice procesarSplit(Apuesta, Usuario).");
     }
 
@@ -203,12 +186,9 @@ public class ApuestaService {
 
         double montoAdicional = apuesta.obtenerMontoInicial();
 
-        if (!validarApuesta(usuario.obtenerSaldo(), montoAdicional)) {
-            return false;
-        }
+        if (!validarMontoAdicional(usuario.obtenerSaldo(), montoAdicional)) {return false;}
 
-        return descontarYRegistrarMovimiento(usuario, montoAdicional, TipoMovimiento.APUESTA
-        );
+        return descontarYRegistrarMovimiento(usuario, montoAdicional, TipoMovimiento.APUESTA);
     }
 
     // Liquidar partida
@@ -292,7 +272,9 @@ public class ApuestaService {
 
                 double retorno = calcularRetorno(apuesta, resultado);
 
-                if (retorno > 0) {usuario.depositarPuntos(retorno);}
+                if (retorno > 0) {
+                    usuario.depositarPuntos(retorno);
+                }
 
                 registrarMovimientoLiquidacion(usuario, apuesta, resultado, retorno, conexion);
             }
@@ -304,7 +286,6 @@ public class ApuestaService {
             // Crear registro definitivo del historial.
 
             HistorialPartida historial = new HistorialPartida(partida.obtenerId(), partida.obtenerFechaInicio(), apuestaTotal, usuario.obtenerSaldo());
-
             Resultados resultadoGlobal = determinarResultadoGlobal(manos, retornoTotal, apuestaTotal);
 
             historial.modificarResultado(resultadoGlobal);
@@ -320,7 +301,9 @@ public class ApuestaService {
 
             // Marcar apuestas liquidadas después del commit.
 
-            for (ManoJugador mano : manos) {mano.obtenerApuesta().liquidar();}
+            for (ManoJugador mano : manos) {
+                mano.obtenerApuesta().liquidar();
+            }
 
         } catch (SQLException | RuntimeException e) {
 
@@ -329,26 +312,25 @@ public class ApuestaService {
 
             throw new IllegalStateException("No se pudo liquidar la partida.", e);
 
-        } finally {cerrarConexion(conexion);}
+        } finally {
+            cerrarConexion(conexion);
+        }
     }
 
     // Determinar resultado global de la partida
 
-    private Resultados determinarResultadoGlobal(List<ManoJugador> manos, double retornoTotal, double apuestaTotal) {
+    private Resultados determinarResultadoGlobal(
+            List<ManoJugador> manos,
+            double retornoTotal,
+            double apuestaTotal) {
 
-        if (manos.size() == 1 && manos.get(0).obtenerResultado() == Resultados.BLACKJACK) {
-            return Resultados.BLACKJACK;
-        }
+        if (manos.size() == 1 && manos.get(0).obtenerResultado() == Resultados.BLACKJACK) {return Resultados.BLACKJACK;}
 
         int comparacion = Double.compare(retornoTotal, apuestaTotal);
 
-        if (comparacion > 0) {
-            return Resultados.GANADA;
-        }
+        if (comparacion > 0) {return Resultados.GANADA;}
 
-        if (comparacion < 0) {
-            return Resultados.PERDIDA;
-        }
+        if (comparacion < 0) {return Resultados.PERDIDA;}
 
         return Resultados.EMPATE;
     }
@@ -356,17 +338,16 @@ public class ApuestaService {
     // Registrar movimiento correspondiente a la liquidación
 
     private void registrarMovimientoLiquidacion(Usuario usuario, Apuesta apuesta, Resultados resultado, double retorno, Connection conexion) {
+
         switch (resultado) {
 
             case GANADA:
             case BLACKJACK:
                 movimientoDAO.registrarMovimiento(usuario.obtenerId(), TipoMovimiento.GANANCIA, retorno, conexion);
                 break;
-
             case EMPATE:
                 movimientoDAO.registrarMovimiento(usuario.obtenerId(), TipoMovimiento.DEVOLUCION, retorno, conexion);
                 break;
-
             case PERDIDA:
                 movimientoDAO.registrarMovimiento(usuario.obtenerId(), TipoMovimiento.PERDIDA, apuesta.obtenerMontoTotal(), conexion);
                 break;
@@ -375,16 +356,20 @@ public class ApuestaService {
 
     // Calcular retorno
 
-    public double calcularRetorno(Apuesta apuesta, Resultados resultado) {
+    public double calcularRetorno(
+            Apuesta apuesta, Resultados resultado) {
+
         if (apuesta == null || resultado == null) {
             throw new IllegalArgumentException("La apuesta y el resultado no pueden ser nulos.");
         }
+
         return apuesta.obtenerRetorno(resultado);
     }
 
     // Recuperar partidas que quedaron pendientes
 
     public void aplicarRecuperacionPartidas(Usuario usuario) {
+
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo.");
         }
@@ -393,20 +378,21 @@ public class ApuestaService {
 
         List<HistorialPartida> pendientes = partidaDAO.consultarPartidasPendientes(usuario.obtenerId());
 
-        if (pendientes == null) {
-            return;
-        }
+        if (pendientes == null) {return;}
 
         for (HistorialPartida pendiente : pendientes) {
-            if (pendiente == null) {
-                continue;
-            }
+
+            if (pendiente == null) {continue;}
+
             Connection conexion = null;
+
             try {
                 conexion = conexionBD.obtenerConexion();
+
                 if (conexion == null) {
                     throw new SQLException("No se pudo obtener la conexión.");
                 }
+
                 conexion.setAutoCommit(false);
 
                 // Una partida pendiente se considera perdida.
@@ -428,22 +414,23 @@ public class ApuestaService {
 
                 throw new IllegalStateException("No se pudo recuperar una partida pendiente.", e);
 
-            } finally {cerrarConexion(conexion);}
+            } finally {
+                cerrarConexion(conexion);
+            }
         }
     }
 
     // Aplicar recuperación de puntos
 
     public void aplicarRecuperacion(Usuario usuario) {
+
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo.");
         }
 
         validarUsuarioPersistido(usuario);
 
-        if (usuario.obtenerSaldo() > 0) {
-            return;
-        }
+        if (usuario.obtenerSaldo() > 0) {return;}
 
         double saldoAnterior = usuario.obtenerSaldo();
         Connection conexion = null;
@@ -472,23 +459,27 @@ public class ApuestaService {
 
             throw new IllegalStateException("No se pudo aplicar la recuperación de puntos.", e);
 
-        } finally {cerrarConexion(conexion);}
+        } finally {
+            cerrarConexion(conexion);
+        }
     }
 
     // Descontar saldo y registrar movimiento en una transacción
 
     private boolean descontarYRegistrarMovimiento(Usuario usuario, double monto, TipoMovimiento tipo) {
-        if (usuario == null || tipo == null || !Validador.validarMonto(monto)) {
-            return false;
-        }
+
+        if (usuario == null || tipo == null || !Validador.validarMonto(monto)) {return false;}
+
         validarUsuarioPersistido(usuario);
-        if (usuario.obtenerSaldo() < monto) {
-            return false;
-        }
+
+        if (usuario.obtenerSaldo() < monto) {return false;}
+
         double saldoAnterior = usuario.obtenerSaldo();
         Connection conexion = null;
+
         try {
             conexion = conexionBD.obtenerConexion();
+
             if (conexion == null) {
                 throw new SQLException("No se pudo obtener la conexión.");
             }
@@ -515,7 +506,9 @@ public class ApuestaService {
 
             throw new IllegalStateException("No se pudo completar la operación de apuesta.", e);
 
-        } finally {cerrarConexion(conexion);}
+        } finally {
+            cerrarConexion(conexion);
+        }
     }
 
     // Validar datos de apuesta
@@ -536,10 +529,7 @@ public class ApuestaService {
     // Validar apuesta pendiente
 
     private boolean validarApuestaPendiente(Apuesta apuesta, Usuario usuario) {
-
-        if (apuesta == null || usuario == null || apuesta.estaLiquidada()) {
-            return false;
-        }
+        if (apuesta == null || usuario == null || apuesta.estaLiquidada()) {return false;}
         validarUsuarioPersistido(usuario);
         return true;
     }
@@ -560,6 +550,7 @@ public class ApuestaService {
     // Restaurar saldo en memoria
 
     private void restaurarSaldo(Usuario usuario, double saldoAnterior) {
+
         if (usuario != null) {
             usuario.modificarSaldo(saldoAnterior);
         }
@@ -568,6 +559,7 @@ public class ApuestaService {
     // Revertir transacción
 
     private void revertirTransaccion(Connection conexion) {
+
         if (conexion != null) {
             try {
                 conexion.rollback();
@@ -580,6 +572,7 @@ public class ApuestaService {
     // Cerrar conexión
 
     private void cerrarConexion(Connection conexion) {
+
         if (conexion != null) {
             conexionBD.cerrarConexion(conexion);
         }

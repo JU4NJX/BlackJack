@@ -14,8 +14,7 @@ public class HistorialPartida {
     private double puntosPerdidos;
     private double saldoFinal;
 
-    public HistorialPartida(int id, LocalDateTime fecha, double apuestaTotal,
-                            double saldoFinal) {
+    public HistorialPartida(int id, LocalDateTime fecha, double apuestaTotal, double saldoFinal) {
         this.id = id;
         this.fecha = fecha;
         this.apuestaTotal = apuestaTotal;

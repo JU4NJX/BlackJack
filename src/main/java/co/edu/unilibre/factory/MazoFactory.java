@@ -11,11 +11,8 @@ public class MazoFactory {
 
     public MazoFactory(CartaFactory cartaFactory) {
         if (cartaFactory == null) {
-            throw new IllegalArgumentException(
-                    "La fábrica de cartas no puede ser nula."
-            );
+            throw new IllegalArgumentException("La fábrica de cartas no puede ser nula.");
         }
-
         this.cartaFactory = cartaFactory;
     }
 

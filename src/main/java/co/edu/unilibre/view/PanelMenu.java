@@ -12,6 +12,7 @@ public class PanelMenu extends JPanel {
     private JButton botonReglas;
     private JButton botonSalir;
 
+
     public PanelMenu(VentanaPrincipal ventana) {
 
         if (ventana == null) {
@@ -108,17 +109,8 @@ public class PanelMenu extends JPanel {
     }
 
     private void salir() {
-
-        int opcion = JOptionPane.showConfirmDialog(
-                this,
-                "¿Estás seguro de que deseas salir?",
-                "Salir de Blackjack",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (opcion == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
+        int opcion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas salir?", "Salir de Blackjack", JOptionPane.YES_NO_OPTION);
+        if (opcion == JOptionPane.YES_OPTION) {System.exit(0);}
     }
 
     public VentanaPrincipal obtenerVentana() {
@@ -128,11 +120,8 @@ public class PanelMenu extends JPanel {
     public void modificarVentana(VentanaPrincipal ventana) {
 
         if (ventana == null) {
-            throw new IllegalArgumentException(
-                    "La ventana principal no puede ser nula."
-            );
+            throw new IllegalArgumentException("La ventana principal no puede ser nula.");
         }
-
         this.ventana = ventana;
     }
 }
