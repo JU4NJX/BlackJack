@@ -33,6 +33,7 @@ class UsuarioServiceTest {
         assertNotNull(resultado);
         assertEquals(1, resultado.obtenerId());
         assertEquals("Jugador", resultado.obtenerNombreUsuario());
+        assertEquals("jugador@blackjack.com", resultado.obtenerCorreo());
         assertEquals(1000.0, resultado.obtenerSaldo());
     }
 
@@ -46,6 +47,16 @@ class UsuarioServiceTest {
         assertEquals("Jugador",
                 usuarioDAO.usuarioGuardado.obtenerNombreUsuario());
         assertTrue(usuarioDAO.usuarioGuardado.obtenerId() > 0);
+    }
+
+    @Test
+    void crearUsuarioPredeterminado_DebeFallarSiNoAsignaId() {
+        usuarioDAO.asignarIdAlGuardar = false;
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> usuarioService.obtenerUsuarioModelo()
+        );
     }
 
     @Test
@@ -114,6 +125,15 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void actualizarSaldoConIdInvalidoOSaldoNoFinito() {
+        Usuario sinId = new Usuario(0, "Jugador", "jugador@blackjack.com", 1000.0, LocalDateTime.now());
+        assertThrows(IllegalArgumentException.class, () -> usuarioService.actualizarSaldo(sinId));
+
+        Usuario saldoNaN = new Usuario(1, "Jugador", "jugador@blackjack.com", Double.NaN, LocalDateTime.now());
+        assertThrows(IllegalArgumentException.class, () -> usuarioService.actualizarSaldo(saldoNaN));
+    }
+
+    @Test
     void actualizarSaldoNegativo() {
 
         Usuario usuario = crearUsuario();
@@ -148,6 +168,7 @@ class UsuarioServiceTest {
 
         private Usuario usuarioGuardado;
         private boolean saldoActualizado;
+        private boolean asignarIdAlGuardar = true;
 
         private UsuarioDAOFalso() {
             super(true);
@@ -173,7 +194,9 @@ class UsuarioServiceTest {
         public void guardar(Usuario usuario,
                             java.sql.Connection conexion) {
 
-            usuario.modificarId(1);
+            if (asignarIdAlGuardar) {
+                usuario.modificarId(1);
+            }
             usuarioGuardado = usuario;
         }
 
