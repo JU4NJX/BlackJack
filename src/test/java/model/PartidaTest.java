@@ -38,9 +38,6 @@ class PartidaTest {
         return partida;
     }
 
-    // =========================================
-    // CONSTRUCTOR
-    // =========================================
 
     @Test
     void constructor_DebeValidarParametrosNulos() {
@@ -48,9 +45,6 @@ class PartidaTest {
         assertThrows(IllegalArgumentException.class, () -> new Partida(1, new Mazo(), null));
     }
 
-    // =========================================
-    // INICIAR Y REPARTIR
-    // =========================================
 
     @Test
     void iniciar_DebeRepartirCuatroCartasYCambiarATurnoJugador() {
@@ -120,9 +114,6 @@ class PartidaTest {
         assertThrows(IllegalStateException.class, () -> partida.agregarManoJugador(new ManoJugador(new Apuesta(100.0))));
     }
 
-    // =========================================
-    // PEDIR CARTA Y PLANTARSE
-    // =========================================
 
     @Test
     void pedirCarta_DebeAgregarCartaYFinalizarSiAlcanza21OSupera21() {
@@ -176,10 +167,6 @@ class PartidaTest {
         assertTrue(partida.obtenerManosJugador().get(0).obtenerPlantada());
         assertThrows(IllegalStateException.class, () -> partida.plantarse(0));
     }
-
-    // =========================================
-    // DOBLAR APUESTA
-    // =========================================
 
     @Test
     void doblarApuesta_DebeDuplicarApuestaRepartirUnaCartaYFinalizarMano() {
@@ -300,9 +287,6 @@ class PartidaTest {
         assertFalse(pocasCartas.dividirMano());
     }
 
-    // =========================================
-    // CRUPIER, FINALIZACION Y ENCAPSULAMIENTO
-    // =========================================
 
     @Test
     void pedirCartaCrupier_DebeAgregarCartaYFallarConMazoVacio() {

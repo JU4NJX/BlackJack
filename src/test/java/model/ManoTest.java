@@ -24,9 +24,6 @@ class ManoTest {
         mano = new Mano();
     }
 
-    // =========================================
-    // MANO BASE
-    // =========================================
 
     @Test
     void manoVacia_DebeTenerCeroPuntosYCeroCartas() {
@@ -128,9 +125,6 @@ class ManoTest {
         assertThrows(IllegalArgumentException.class, () -> mano.modificarCartas(null));
     }
 
-    // =========================================
-    // MANO JUGADOR
-    // =========================================
 
     @Test
     void manoJugador_DebeRechazarApuestaNula() {

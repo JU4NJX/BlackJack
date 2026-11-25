@@ -57,9 +57,6 @@ class ApuestaServiceTest {
         return partida;
     }
 
-    // =========================================
-    // CONSTRUCTORES
-    // =========================================
 
     @Test
     void constructor_DebeRechazarDependenciasNulas() {
@@ -70,9 +67,6 @@ class ApuestaServiceTest {
         assertDoesNotThrow(() -> new ApuestaService());
     }
 
-    // =========================================
-    // VALIDAR APUESTA
-    // =========================================
 
     @Test
     void validarApuesta_DebeAceptarApuestaValida() {
@@ -114,10 +108,6 @@ class ApuestaServiceTest {
         assertFalse(apuestaService.validarApuesta(Double.NaN, 100.0));
         assertFalse(apuestaService.validarApuesta(Double.POSITIVE_INFINITY, 100.0));
     }
-
-    // =========================================
-    // CALCULAR RETORNO
-    // =========================================
 
     @Test
     void calcularRetorno_DebeCalcularVictoria() {
@@ -164,9 +154,7 @@ class ApuestaServiceTest {
         );
     }
 
-    // =========================================
-    // REGISTRAR APUESTA
-    // =========================================
+
 
     @Test
     void registrarApuestaSoloApuesta_DebeLanzarExcepcion() {
@@ -250,10 +238,6 @@ class ApuestaServiceTest {
         assertTrue(conexionDB.conexionCerrada);
     }
 
-    // =========================================
-    // DOBLE APUESTA Y SPLIT
-    // =========================================
-
     @Test
     void procesarDobleApuestaYSplitSinUsuario_DebenLanzarExcepcion() {
         Apuesta apuesta = new Apuesta(100.0);
@@ -296,9 +280,6 @@ class ApuestaServiceTest {
         assertFalse(apuestaService.procesarSplit(null, usuario));
     }
 
-    // =========================================
-    // LIQUIDAR PARTIDA
-    // =========================================
 
     @Test
     void liquidarPartida_VictoriaDebeAcreditarDobleYMarcarLiquidada() {
@@ -409,10 +390,6 @@ class ApuestaServiceTest {
         assertTrue(conexionDB.rollbackRealizado);
     }
 
-    // =========================================
-    // RECUPERACION DE PARTIDAS Y PUNTOS
-    // =========================================
-
     @Test
     void aplicarRecuperacionPartidas_DebeMarcarPendientesComoPerdidas() {
         Usuario usuario = crearUsuario(1, 500.0);
@@ -452,9 +429,7 @@ class ApuestaServiceTest {
         assertThrows(IllegalArgumentException.class, () -> apuestaService.aplicarRecuperacion(null));
     }
 
-    // =========================================
-    // DOBLES DE PRUEBA
-    // =========================================
+
 
     private static class UsuarioDAOFalso extends UsuarioDAO {
         boolean actualizado;

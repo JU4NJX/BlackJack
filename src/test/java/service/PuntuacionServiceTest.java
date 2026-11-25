@@ -56,9 +56,6 @@ class PuntuacionServiceTest {
         );
     }
 
-    // =========================================
-    // TIENE BLACKJACK
-    // =========================================
 
     @Test
     void tieneBlackjack_DebeIdentificarBlackjackNatural() {
@@ -75,9 +72,6 @@ class PuntuacionServiceTest {
         );
     }
 
-    // =========================================
-    // DETERMINAR RESULTADO
-    // =========================================
 
     @Test
     void determinarResultado_DebeRechazarManosNulas() {
@@ -153,9 +147,7 @@ class PuntuacionServiceTest {
         );
     }
 
-    // =========================================
-    // COMPARAR PUNTUACIONES
-    // =========================================
+
 
     @Test
     void compararPuntuaciones_DebeRechazarManosNulas() {

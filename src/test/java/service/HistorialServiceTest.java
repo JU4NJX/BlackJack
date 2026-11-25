@@ -30,9 +30,6 @@ class HistorialServiceTest {
         campoDao.set(historialService, partidaDAO);
     }
 
-    // =========================================
-    // REGISTRAR PARTIDA
-    // =========================================
 
     @Test
     void registrarPartida_DebeRechazarPartidaNula() {
@@ -63,9 +60,6 @@ class HistorialServiceTest {
         );
     }
 
-    // =========================================
-    // CONSULTAR HISTORIAL
-    // =========================================
 
     @Test
     void consultarHistorial_DebeRechazarIdUsuarioInvalido() {

@@ -72,9 +72,6 @@ class JuegoServiceTest {
         return new Usuario(1, "Jugador", "jugador@blackjack.com", saldo, LocalDateTime.now());
     }
 
-    // =====================================================
-    // PRUEBAS DE CONSTRUCTOR
-    // =====================================================
 
     @Test
     void constructorConDependenciasValidas() {
@@ -117,10 +114,6 @@ class JuegoServiceTest {
         );
     }
 
-    // =====================================================
-    // PRUEBAS DE OBSERVADORES
-    // =====================================================
-
     @Test
     void agregarObservadorNulo() {
         assertThrows(
@@ -159,9 +152,6 @@ class JuegoServiceTest {
         assertDoesNotThrow(() -> juegoService.notificarObservadores());
     }
 
-    // =====================================================
-    // PRUEBAS SIN PARTIDA ACTIVA
-    // =====================================================
 
     @Test
     void pedirCartaSinPartidaActiva() {
@@ -193,9 +183,6 @@ class JuegoServiceTest {
         assertThrows(IllegalStateException.class, () -> juegoService.finalizarPartida());
     }
 
-    // =====================================================
-    // PRUEBAS DE FLUJO DE PARTIDA
-    // =====================================================
 
     @Test
     void iniciarPartida_DebeValidarUsuarioApuestaYPartidaEnCurso() {

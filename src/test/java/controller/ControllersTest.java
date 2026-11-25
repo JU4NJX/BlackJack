@@ -28,9 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ControllersTest {
 
-    // =========================================
-    // USUARIO CONTROLLER
-    // =========================================
+
 
     @Test
     void usuarioController_DebeValidarConstructorYDelegarOperaciones() {
@@ -65,9 +63,6 @@ class ControllersTest {
         assertEquals(1500.0, controller.consultarSaldo(1), 0.001);
     }
 
-    // =========================================
-    // APUESTA CONTROLLER
-    // =========================================
 
     @Test
     void apuestaController_DebeValidarConstructorSaldoYRegistro() {
@@ -102,9 +97,6 @@ class ControllersTest {
         assertThrows(IllegalArgumentException.class, () -> controller.seleccionarApuesta(600.0));
     }
 
-    // =========================================
-    // HISTORIAL CONTROLLER
-    // =========================================
 
     @Test
     void historialController_DebeValidarConstructorYCargarHistorial() {
@@ -128,9 +120,6 @@ class ControllersTest {
         assertEquals("GANADA", resultado.get(0).obtenerResultado());
     }
 
-    // =========================================
-    // JUEGO CONTROLLER
-    // =========================================
 
     @Test
     void juegoController_DebeValidarConstructorYDelegarTodasLasAcciones() {

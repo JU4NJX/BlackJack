@@ -30,9 +30,6 @@ class EstadoPartidaTest {
         return partida;
     }
 
-    // =========================================
-    // ESTADO INICIAL
-    // =========================================
 
     @Test
     void estadoInicial_IniciarConPartidaNulaDebeLanzarExcepcion() {
@@ -62,9 +59,6 @@ class EstadoPartidaTest {
         assertThrows(IllegalStateException.class, () -> estado.ejecutarTurno(partida));
     }
 
-    // =========================================
-    // ESTADO TURNO JUGADOR
-    // =========================================
 
     @Test
     void estadoTurnoJugador_IniciarDebeLanzarExcepcion() {
@@ -98,9 +92,6 @@ class EstadoPartidaTest {
         assertFalse(partida.estaFinalizada());
     }
 
-    // =========================================
-    // ESTADO TURNO CRUPIER
-    // =========================================
 
     @Test
     void estadoTurnoCrupier_AccionesDeJugadorOInicioDebenLanzarExcepcion() {
@@ -124,10 +115,6 @@ class EstadoPartidaTest {
         assertInstanceOf(EstadoFinalizado.class, partida.obtenerEstadoActual());
     }
 
-    // =========================================
-    // ESTADO FINALIZADO
-    // =========================================
-
     @Test
     void estadoFinalizado_TodasLasAccionesDebenLanzarExcepcion() {
         EstadoFinalizado estado = new EstadoFinalizado();
@@ -139,9 +126,7 @@ class EstadoPartidaTest {
         assertThrows(IllegalStateException.class, () -> estado.ejecutarTurno(partida));
     }
 
-    // =========================================
-    // CICLO COMPLETO DE ESTADOS
-    // =========================================
+
 
     @Test
     void cicloCompletoDeEstados_DebeTransicionarCorrectamenteHastaFinalizado() {

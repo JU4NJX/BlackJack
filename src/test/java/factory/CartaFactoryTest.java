@@ -26,9 +26,7 @@ class CartaFactoryTest {
         mazoFactory = new MazoFactory(cartaFactory);
     }
 
-    // =========================================
-    // CARTA FACTORY ESTANDAR
-    // =========================================
+
 
     @Test
     void crearCarta_DebeCrearCartaConPaloYValorValidos() {
@@ -68,9 +66,7 @@ class CartaFactoryTest {
         );
     }
 
-    // =========================================
-    // MAZO FACTORY
-    // =========================================
+
 
     @Test
     void mazoFactory_DebeRechazarCartaFactoryNula() {
