@@ -245,6 +245,9 @@ public class JuegoService implements Sujeto {
         partidaActual.modificarEstadoActual(new EstadoFinalizado());
         // Liquidar apuestas y actualizar la información en la base de datos.
         apuestaService.liquidarPartida(partidaActual, usuarioActual);
+        if (usuarioActual.obtenerSaldo() == 0){
+            apuestaService.aplicarRecuperacion(usuarioActual);
+        }
 
         notificarObservadores();
         return construirPartidaDTO();

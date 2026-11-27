@@ -60,7 +60,7 @@ public class ApuestaService {
         return Double.isFinite(saldo) && saldo >= 0 && Validador.validarMonto(monto) && saldo >= monto;
     }
 
-    // Registrar apuesta (firma original del UML)
+    // Registrar apuesta
 
     public void registrarApuesta(Apuesta apuesta) {
         throw new IllegalStateException("Para registrar una apuesta se necesita identificar " + "al usuario. Utilice registrarApuesta(Apuesta, Usuario).");
@@ -152,7 +152,7 @@ public class ApuestaService {
         }
     }
 
-    // Procesar doble apuesta (firma original del UML)
+    // Procesar doble apuesta
 
     public boolean procesarDobleApuesta(Apuesta apuesta) {
         throw new IllegalStateException("Para procesar una doble apuesta se necesita identificar " + "al usuario. Utilice procesarDobleApuesta(Apuesta, Usuario).");
@@ -170,7 +170,7 @@ public class ApuestaService {
         return descontarYRegistrarMovimiento(usuario, montoAdicional, TipoMovimiento.APUESTA);
     }
 
-    // Procesar división (firma original del UML)
+    // Procesar división
 
     public boolean procesarSplit(Apuesta apuesta) {
         throw new IllegalStateException("Para procesar una división se necesita identificar " + "al usuario. Utilice procesarSplit(Apuesta, Usuario).");

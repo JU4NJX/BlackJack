@@ -9,6 +9,7 @@ import co.edu.unilibre.controller.UsuarioController;
 import co.edu.unilibre.factory.CartaFactoryEstandar;
 import co.edu.unilibre.factory.MazoFactory;
 
+import co.edu.unilibre.model.Usuario;
 import co.edu.unilibre.service.JuegoService;
 import co.edu.unilibre.service.ApuestaService;
 import co.edu.unilibre.service.UsuarioService;
@@ -36,9 +37,9 @@ public class Main {
 
                 // 2. Crear servicios
                 UsuarioService usuarioService = new UsuarioService();
-
                 ApuestaService apuestaService = new ApuestaService();
-
+                Usuario usuarioActual = usuarioService.obtenerUsuarioModelo();
+                apuestaService.aplicarRecuperacion(usuarioActual);
                 HistorialService historialService = new HistorialService();
 
                 JuegoService juegoService = new JuegoService(new EstrategiaClasica(), mazoFactory, apuestaService);
